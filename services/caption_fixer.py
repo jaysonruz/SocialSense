@@ -26,6 +26,12 @@ def check_correction_type(correction):
     return True
 
 def fix_my_cap(text):
+    """
+    text: String 
+    # 
+    # takes the text as string and then removes hash tags and mentions and runs gingerit after that.
+    
+    """
     parser = GingerIt()
     return parser.parse(remove_emoticons_hashtags_tags(text))
 
