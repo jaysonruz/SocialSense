@@ -1,16 +1,82 @@
-# This is a sample Python script.
+from datetime import datetime, timedelta
+from typing import Optional
+import databases
+import enum
+import jwt
+import sqlalchemy
+from h11._abnf import status_code
+from pydantic import BaseModel, validator
+from fastapi import FastAPI, HTTPException, dependencies, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from decouple import config
+from email_validator import validate_email as validate_e, EmailNotValidError
+from passlib.context import CryptContext
+from starlette.requests import Request
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+#-----------------------------------------DATABASES------------------------------------------#
+
+DATABASE_URL = f"{config('DATABASE_URL')}"
+database = databases.Database(DATABASE_URL)
+metadata = sqlalchemy.MetaData()
+
+#---------------------------------------------------------------------------------------------#
+#-----------------------------------------MODELS----------------------------------------------#
+
+class UserRole(enum.Enum):
+    super_admin = "super admin"
+    admin = "admin"
+    user = "user"
+
+users = sqlalchemy.Table(
+    "users",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("email", sqlalchemy.String(120), unique=True),
+    sqlalchemy.Column("password", sqlalchemy.String(255)),
+    sqlalchemy.Column("full_name", sqlalchemy.String(200)),
+    sqlalchemy.Column("phone", sqlalchemy.String(13)),
+    sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False, 
+                      server_default=sqlalchemy.func.now()),
+    sqlalchemy.Column(
+        "last_modified_at",
+        sqlalchemy.DateTime,
+        nullable=False,
+        server_default=sqlalchemy.func.now(),
+        onupdate=sqlalchemy.func.now(),
+    ),
+    sqlalchemy.Column("role", sqlalchemy.Enum(UserRole), nullable=False, 
+                      server_default=UserRole.user.name),
+)
+
+class social_media_categories(enum.Enum):
+    Instagram = "Instagram"
+    Twitter = "Twitter"
+    Facebook = "Facebook"
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+user_subscriptions = sqlalchemy.Table(
+    "user_subscriptions",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("sm_category",sqlalchemy.Enum(social_media_categories),nullable=False),
+    sqlalchemy.Column("sm_handle",sqlalchemy.String(50),nullable=False),
+    sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id"),nullable=False, index=True),
+)
 
+#----------------------------------------------------------------------------------------------#
+#------------------------------------------FASTAPI---------------------------------------------#
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+app = FastAPI() 
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+@app.on_event("startup")
+async def startup():
+    await database.connect()
+
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()
+    
+#-----------------------------------------------------------------------------------------------#
+#--------------------------------------------ROUTES---------------------------------------------#
+
+#-----------------------------------------------------------------------------------------------#
