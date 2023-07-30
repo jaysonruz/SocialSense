@@ -113,7 +113,15 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
-    
+
+def create_access_token(user):
+    try:
+        payload = {"sub": user["id"], "exp": datetime.utcnow() + 
+        timedelta(minutes=120)}
+        return jwt.encode(payload, config('JWT_SECRET'),algorithm='HS256')
+    except Exception as e:
+        raise e
+
 #-----------------------------------------------------------------------------------------------#
 #--------------------------------------------ROUTES---------------------------------------------#
 @app.post("/register", status_code=201, response_model=UserRegOut)
@@ -136,13 +144,18 @@ async def user_login(user: UserSignIn):
     # Compare the provided password with the hashed password in the database
     if not pwd_context.verify(user.password, db_user["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-
-    return {"message": "Login successful"}
+    
+    token = create_access_token(db_user)
+    
+    return { "message": "Login successful",
+             "token": token }
 
 
 @app.post("/instagram_posts")
 def fetch_instagram_posts(ig_id: InstagramPostRequest):
     ig_posts= scrape_instagram_data(instagram_id=ig_id.instagram_id,all_posts=False)
     return ig_posts
+
+
 
 #-----------------------------------------------------------------------------------------------#
