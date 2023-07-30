@@ -13,6 +13,9 @@ from email_validator import validate_email as validate_e, EmailNotValidError
 from passlib.context import CryptContext
 from starlette.requests import Request
 
+from services.apify_instagram import scrape_instagram_data
+from services.caption_fixer import fix_my_cap
+
 #-----------------------------------------DATABASES------------------------------------------#
 
 DATABASE_URL = f"{config('DATABASE_URL')}"
@@ -70,6 +73,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
+    # [print(x) for x in scrape_instagram_data("nike")] #testing 
     await database.connect()
 
 @app.on_event("shutdown")
