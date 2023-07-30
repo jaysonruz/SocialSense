@@ -116,9 +116,15 @@ async def shutdown():
 
 def create_access_token(user):
     try:
-        payload = {"sub": user["id"], "exp": datetime.utcnow() + 
-        timedelta(minutes=120)}
-        return jwt.encode(payload, config('JWT_SECRET'),algorithm='HS256')
+        payload = {"sub": user["id"], "exp": datetime.utcnow() + timedelta(minutes=15)}
+        return jwt.encode(payload, config('JWT_SECRET'), algorithm='HS256')
+    except Exception as e:
+        raise e
+
+def create_refresh_token(user):
+    try:
+        payload = {"sub": user["id"], "exp": datetime.utcnow() + timedelta(days=30)}
+        return jwt.encode(payload, config('JWT_REFRESH_SECRET'), algorithm='HS256')
     except Exception as e:
         raise e
 
@@ -145,10 +151,14 @@ async def user_login(user: UserSignIn):
     if not pwd_context.verify(user.password, db_user["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    token = create_access_token(db_user)
+    access_token = create_access_token(db_user)
+    refresh_token = create_refresh_token(db_user)
     
-    return { "message": "Login successful",
-             "token": token }
+    return {
+        "message": "Login successful",
+        "access_token": access_token,
+        "refresh_token": refresh_token
+    }
 
 
 @app.post("/instagram_posts")
