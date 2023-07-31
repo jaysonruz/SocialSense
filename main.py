@@ -5,13 +5,16 @@ import enum
 import jwt
 import sqlalchemy
 from h11._abnf import status_code
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator,EmailStr
 from fastapi import FastAPI, HTTPException, dependencies, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from decouple import config
 from email_validator import validate_email as validate_e, EmailNotValidError
 from passlib.context import CryptContext
 from starlette.requests import Request
+
+from services.apify_instagram import scrape_instagram_data
+from services.caption_fixer import fix_my_cap
 
 #-----------------------------------------DATABASES------------------------------------------#
 
@@ -27,14 +30,14 @@ class UserRole(enum.Enum):
     admin = "admin"
     user = "user"
 
-users = sqlalchemy.Table(
+tb_users = sqlalchemy.Table(
     "users",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
     sqlalchemy.Column("email", sqlalchemy.String(120), unique=True),
     sqlalchemy.Column("password", sqlalchemy.String(255)),
-    sqlalchemy.Column("full_name", sqlalchemy.String(200)),
-    sqlalchemy.Column("phone", sqlalchemy.String(13)),
+    sqlalchemy.Column("first_name", sqlalchemy.String(20),nullable=False),
+    sqlalchemy.Column("Last_name", sqlalchemy.String(20),nullable=False),
     sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False, 
                       server_default=sqlalchemy.func.now()),
     sqlalchemy.Column(
@@ -54,7 +57,7 @@ class social_media_categories(enum.Enum):
     Facebook = "Facebook"
 
 
-user_subscriptions = sqlalchemy.Table(
+tb_user_subscriptions = sqlalchemy.Table(
     "user_subscriptions",
     metadata,
     sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
@@ -64,19 +67,105 @@ user_subscriptions = sqlalchemy.Table(
 )
 
 #----------------------------------------------------------------------------------------------#
-#------------------------------------------FASTAPI---------------------------------------------#
+#------------------------------------------VALIDATORS------------------------------------------#
+class BaseUser(BaseModel):
+    email: EmailStr
+    first_name: str
+    Last_name:str
+        
+    @validator('first_name')
+    def validate_name(cls, v):
+        if len(v) < 3:
+            raise ValueError("The name should be at least 3 characters long.")
+        return v
+    
+    @validator('Last_name')
+    def validate_name(cls, v):
+        if len(v) < 3:
+            raise ValueError("The name should be at least 3 characters long.")
+        return v
+    
 
+class UserRegIn(BaseUser):
+    password: str
+
+class UserRegOut(BaseUser):
+    created_at: datetime
+    last_modified_at: datetime
+
+class UserSignIn(BaseModel):
+    email: EmailStr
+    password: str
+
+class InstagramPostRequest(BaseModel):
+    instagram_id: str
+
+#----------------------------------------------------------------------------------------------#
+#------------------------------------------FASTAPI---------------------------------------------#
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI() 
 
 @app.on_event("startup")
 async def startup():
+    # [print(x) for x in scrape_instagram_data("nike")] #testing 
     await database.connect()
 
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
-    
+
+def create_access_token(user):
+    try:
+        payload = {"sub": user["id"], "exp": datetime.utcnow() + timedelta(minutes=15)}
+        return jwt.encode(payload, config('JWT_SECRET'), algorithm='HS256')
+    except Exception as e:
+        raise e
+
+def create_refresh_token(user):
+    try:
+        payload = {"sub": user["id"], "exp": datetime.utcnow() + timedelta(days=30)}
+        return jwt.encode(payload, config('JWT_REFRESH_SECRET'), algorithm='HS256')
+    except Exception as e:
+        raise e
+
 #-----------------------------------------------------------------------------------------------#
 #--------------------------------------------ROUTES---------------------------------------------#
+@app.post("/register", status_code=201, response_model=UserRegOut)
+async def create_user(user: UserRegIn):
+    user.password = pwd_context.hash(user.password)
+    q = tb_users.insert().values(**user.dict())
+    id_ = await database.execute(q)
+    user = await database.fetch_one(tb_users.select().where(tb_users.c.id == id_))
+    return user
+
+@app.post("/login")
+async def user_login(user: UserSignIn):
+    # Retrieve user from the database based on the provided email
+    query = tb_users.select().where(tb_users.c.email == user.email)
+    db_user = await database.fetch_one(query)
+
+    if db_user is None:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    # Compare the provided password with the hashed password in the database
+    if not pwd_context.verify(user.password, db_user["password"]):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    access_token = create_access_token(db_user)
+    refresh_token = create_refresh_token(db_user)
+    
+    return {
+        "message": "Login successful",
+        "access_token": access_token,
+        "refresh_token": refresh_token
+    }
+
+
+@app.post("/instagram_posts")
+def fetch_instagram_posts(ig_id: InstagramPostRequest):
+    ig_posts= scrape_instagram_data(instagram_id=ig_id.instagram_id,all_posts=False)
+    return ig_posts
+
+
 
 #-----------------------------------------------------------------------------------------------#
