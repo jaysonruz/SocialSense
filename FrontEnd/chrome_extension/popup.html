@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SocialSense</title>
+  <style>
+    body {
+      min-width: 300px;
+      min-height: 200px;
+      padding: 20px;
+    }
+    #message {
+      font-size: 20px;
+    }
+    #instagramInput {
+      margin-top: 10px;
+      width: 70%; /* Adjust the width to leave space for the button */
+    }
+    #submitBtn {
+      margin-top: 10px;
+      width: 30%; /* Adjust the width to leave space for the input field */
+    }
+    #instagramList {
+      margin-top: 10px;
+      list-style-type: none;
+      padding: 0;
+    }
+    #instagramList li {
+      margin-bottom: 5px;
+    }
+  </style>
+  <script src="popup.js"></script>
+</head>
+<body>
+  <div>
+    <div id="message">SocialSense</div>
+    <input type="text" id="instagramInput" placeholder="Enter Instagram ID" />
+    <!-- Add a submit button with an ID for easier access in JavaScript -->
+    <button type="button" id="submitBtn">Submit</button>
+    <ul id="instagramList"></ul>
+  </div>
+</body>
+</html>

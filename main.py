@@ -15,7 +15,7 @@ from starlette.requests import Request
 
 from services.apify_instagram import scrape_instagram_data
 from services.caption_fixer import fix_my_cap
-
+from fastapi.middleware.cors import CORSMiddleware
 #-----------------------------------------DATABASES------------------------------------------#
 
 DATABASE_URL = f"{config('DATABASE_URL')}"
@@ -102,8 +102,20 @@ class InstagramPostRequest(BaseModel):
 
 #----------------------------------------------------------------------------------------------#
 #------------------------------------------FASTAPI---------------------------------------------#
+origins = [
+    "http://127.0.0.1:8000",  # This is the default FastAPI server origin
+    "chrome-extension://cdpjgindfjcedmeikjnahnkbpgfkbmpe"  # Replace with your Chrome extension's origin
+]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI() 
+# Add the CORS middleware with allowed origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 async def startup():
@@ -164,6 +176,7 @@ async def user_login(user: UserSignIn):
 @app.post("/instagram_posts")
 def fetch_instagram_posts(ig_id: InstagramPostRequest):
     ig_posts= scrape_instagram_data(instagram_id=ig_id.instagram_id,all_posts=False)
+    # returns array of dict
     return ig_posts
 
 
