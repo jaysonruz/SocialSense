@@ -2,10 +2,11 @@
 <html>
 <head>
   <title>SocialSense</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
   <style>
     body {
-      min-width: 300px;
-      min-height: 200px;
+      width: 600px;
+      height: 500px;
       padding: 20px;
     }
     #message {
@@ -31,12 +32,25 @@
   <script src="popup.js"></script>
 </head>
 <body>
-  <div>
-    <div id="message">SocialSense</div>
-    <input type="text" id="instagramInput" placeholder="Enter Instagram ID" />
-    <!-- Add a submit button with an ID for easier access in JavaScript -->
-    <button type="button" id="submitBtn">Submit</button>
-    <ul id="instagramList"></ul>
-  </div>
+  <section>
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          <div id="message">SocialSense</div>
+      <div class="d-flex">
+        <input class="me-2 rounded p-2" type="text" id="instagramInput" placeholder="Enter Instagram ID" />
+      <!-- Add a submit button with an ID for easier access in JavaScript -->
+      <button class="btn btn-primary" type="button" id="submitBtn">Submit</button>
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      </div>
+      <ul id="instagramList"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
 </html>
