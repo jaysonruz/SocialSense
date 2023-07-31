@@ -28,13 +28,24 @@ document.addEventListener('DOMContentLoaded', function () {
           const listItem = document.createElement('li');
   
           // Create the HTML structure for each post
-          const postHTML = `
-            <div>
-              <p>${post.caption}</p>
-              <img src="${post.displayUrl}" alt="${post.alt}">
-              <br>
-            </div>
-          `;
+          // Create the HTML structure for each post
+        const postHTML = `
+        <div class="post-container" style="background-color: #ffffc2;" padding: 10px; display: flex; align-items: center;">
+          <div style="width: 400px; height: auto; border-radius: 50%; overflow: hidden; margin-right: 10px;">
+            <img style="width: 100%; height: 100%; display:block" crossorigin="anonymous" src="${post.displayUrl}" alt="${post.alt}">
+          </div>
+          <div style="flex: 1;">
+            <p><strong>Display URL:</strong> <a href="${post.displayUrl}" target="_blank">${post.displayUrl}</a></p>
+            <p><strong>URL:</strong> <a href="${post.url}" target="_blank">${post.url}</a></p>
+            <p><strong>type:</strong> ${post.type}</p>
+            <p><strong>Caption:</strong> ${post.caption}</p>
+            <p><strong>timestamp:</strong> ${post.timestamp}</p>
+            <p><strong>likesCount:</strong> ${post.likesCount}</p>
+
+          </div>
+        </div>
+        `;
+
   
           listItem.innerHTML = postHTML;
           instagramList.appendChild(listItem);
