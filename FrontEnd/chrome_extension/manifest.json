@@ -11,6 +11,8 @@
   },
   "permissions": ["activeTab"],
   "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; img-src *;",
+    "sandbox": "sandbox allow-scripts; script-src 'self' https://code.jquery.com; object-src 'self'",
     "web_accessible_resources": ["popup.html"]
   }
 }

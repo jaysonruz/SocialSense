@@ -175,9 +175,17 @@ async def user_login(user: UserSignIn):
 
 @app.post("/instagram_posts")
 def fetch_instagram_posts(ig_id: InstagramPostRequest):
+    result = []
     ig_posts= scrape_instagram_data(instagram_id=ig_id.instagram_id,all_posts=False)
     # returns array of dict
-    return ig_posts
+    for post in ig_posts:
+        gingered_op = fix_my_cap(post['caption'])
+        post['any_corrections']= len(gingered_op["corrections"]) > 0
+        post['correction_results']=gingered_op["result"]
+        post['corrections_list']=gingered_op["corrections"]
+        result.append(post)
+    return result
+
 
 
 

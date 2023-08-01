@@ -39,9 +39,9 @@ document.addEventListener('DOMContentLoaded', function () {
             <p><strong>URL:</strong> <a href="${post.url}" target="_blank">${post.url}</a></p>
             <p><strong>type:</strong> ${post.type}</p>
             <p><strong>Caption:</strong> ${post.caption}</p>
-            <p><strong>timestamp:</strong> ${post.timestamp}</p>
-            <p><strong>likesCount:</strong> ${post.likesCount}</p>
-
+            <p><strong>any_corrections:</strong> ${post.any_corrections}</p>
+            <p><strong>corrections_lists:</strong> ${post.corrections_list}</p>
+            <p><strong>correction_results:</strong> ${post.correction_results}</p>
           </div>
         </div>
         `;

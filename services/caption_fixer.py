@@ -42,3 +42,7 @@ if __name__ == "__main__":
     
     result = fix_my_cap(text)
     print(result)
+
+# {'text': 'Gamers or hustlers. Corporate warriors or students. Whatever be their trip, what trips them up is a laptop that just cannot keep pace. for as part of “The Hunt for India’s Slowest Laptop” campaign by Team 21N.\n    Credits:\n    Brand:', 
+# 'result': 'Gamers or hustlers. Corporate warriors or students. Whatever be their trip, what trips them up is a laptop that just cannot keep pace. Four as part of “The Hunt for India’s Slowest Laptop” campaign by Team 21N.\n    Credits:\n    Brand:', 
+# 'corrections': [{'start': 135, 'text': 'for', 'correct': 'Four', 'definition': None}]}

@@ -23,8 +23,8 @@ def upload_image_to_s3_from_url(image_url, bucket_name, s3_key, access_key, secr
 
 if __name__ == "__main__":
     image_url = "https://instagram.fesb3-2.fna.fbcdn.net/v/t51.2885-15/364208468_1508629073274564_7815734344700095953_n.jpg?stp=dst-jpg_e15&_nc_ht=instagram.fesb3-2.fna.fbcdn.net&_nc_cat=1&_nc_ohc=Ce-80P4_aYoAX_ZiqkT&edm=AOQ1c0wBAAAA&ccb=7-5&oh=00_AfAGpL9C4MQYTPIOg8A1t7YLZKoHEAZ4A7bM9NUGwn0itg&oe=64C96DC0&_nc_sid=8b3546"
-    bucket_name = "socialsensebucket"
     s3_key = "uploaded_image.jpg"
+    bucket_name = os.environ.get("S3_BUCKET_NAME")
     aws_access_key = os.environ.get("AWS_ACCESS_KEY")
     aws_secret_key = os.environ.get("AWS_SECRET_KEY")
 
