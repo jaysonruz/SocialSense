@@ -15,6 +15,7 @@ from starlette.requests import Request
 
 from services.apify_instagram import scrape_instagram_data
 from services.caption_fixer import fix_my_cap
+from services.convert_image_to_blob import convert_image_to_blob
 from fastapi.middleware.cors import CORSMiddleware
 #-----------------------------------------DATABASES------------------------------------------#
 
@@ -183,6 +184,8 @@ def fetch_instagram_posts(ig_id: InstagramPostRequest):
         post['any_corrections']= len(gingered_op["corrections"]) > 0
         post['correction_results']=gingered_op["result"]
         post['corrections_list']=gingered_op["corrections"]
+        blobed_image = convert_image_to_blob(post['displayUrl'])
+        post["displayUrl_blob"]=blobed_image
         result.append(post)
     return result
 
