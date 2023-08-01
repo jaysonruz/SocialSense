@@ -1,0 +1,16 @@
+{
+  "name": "SocialSense Chrome Extension",
+  "version": "1.0",
+  "description": "A simple Chrome extension that displays Instagram posts and its corrections.",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab"],
+  "content_security_policy": {
+    "web_accessible_resources": ["popup.html"]
+  }
+}
