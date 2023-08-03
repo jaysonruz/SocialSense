@@ -12,11 +12,18 @@ from decouple import config
 from email_validator import validate_email as validate_e, EmailNotValidError
 from passlib.context import CryptContext
 from starlette.requests import Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from uvicorn import Config, Server
 
 from services.apify_instagram import scrape_instagram_data
 from services.caption_fixer import fix_my_cap
-from services.convert_image_to_blob import convert_image_to_blob
-from fastapi.middleware.cors import CORSMiddleware
+# from services.convert_image_to_blob import convert_image_to_blob
+from services.Imagedownloader import download_image
+
+import pathlib
+HOME_DIR = pathlib.Path(__file__).parent.resolve()
+STATIC_IMAGES_DIR = HOME_DIR/"imgs"
 #-----------------------------------------DATABASES------------------------------------------#
 
 DATABASE_URL = f"{config('DATABASE_URL')}"
@@ -109,6 +116,9 @@ origins = [
 ]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI() 
+
+app.mount("/imgs", StaticFiles(directory="imgs"), name='images')
+
 # Add the CORS middleware with allowed origins
 app.add_middleware(
     CORSMiddleware,
@@ -184,12 +194,14 @@ def fetch_instagram_posts(ig_id: InstagramPostRequest):
         post['any_corrections']= len(gingered_op["corrections"]) > 0
         post['correction_results']=gingered_op["result"]
         post['corrections_list']=gingered_op["corrections"]
-        blobed_image = convert_image_to_blob(post['displayUrl'])
-        post["displayUrl_blob"]=blobed_image
+
+        # dowload img and serve it from local
+        file_name = f"{post['id']}.jpg" 
+        img_save_path = str(STATIC_IMAGES_DIR/file_name)
+        download_image(url=post['displayUrl'],save_path=img_save_path)
+        post["displayUrl_hosted"]=f"/imgs/{file_name}"
+
         result.append(post)
     return result
-
-
-
 
 #-----------------------------------------------------------------------------------------------#
