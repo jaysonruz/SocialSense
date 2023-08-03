@@ -112,7 +112,8 @@ class InstagramPostRequest(BaseModel):
 #------------------------------------------FASTAPI---------------------------------------------#
 origins = [
     "http://127.0.0.1:8000",  # This is the default FastAPI server origin
-    "chrome-extension://cdpjgindfjcedmeikjnahnkbpgfkbmpe"  # Replace with your Chrome extension's origin
+    "chrome-extension://cdpjgindfjcedmeikjnahnkbpgfkbmpe",  # Replace with your Chrome extension's origin
+    "chrome-extension://anpppboobkdbncaffjiopmjplenamine"
 ]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI() 
@@ -190,6 +191,7 @@ def fetch_instagram_posts(ig_id: InstagramPostRequest):
     ig_posts= scrape_instagram_data(instagram_id=ig_id.instagram_id,all_posts=False)
     # returns array of dict
     for post in ig_posts:
+        print(f"DEBUG: processing {post['id']}")
         gingered_op = fix_my_cap(post['caption'])
         post['any_corrections']= len(gingered_op["corrections"]) > 0
         post['correction_results']=gingered_op["result"]
