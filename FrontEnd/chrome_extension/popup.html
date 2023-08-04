@@ -2,33 +2,8 @@
 <html>
 <head>
   <title>SocialSense</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-  <style>
-    body {
-      width: 600px;
-      height: 500px;
-      padding: 20px;
-    }
-    #message {
-      font-size: 20px;
-    }
-    #instagramInput {
-      margin-top: 10px;
-      width: 70%; /* Adjust the width to leave space for the button */
-    }
-    #submitBtn {
-      margin-top: 10px;
-      width: 30%; /* Adjust the width to leave space for the input field */
-    }
-    #instagramList {
-      margin-top: 10px;
-      list-style-type: none;
-      padding: 0;
-    }
-    #instagramList li {
-      margin-bottom: 5px;
-    }
-  </style>
+  <link rel="stylesheet" href="css/mystyle.css">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
   <script src="popup.js"></script>
 </head>
 <body>
@@ -36,21 +11,23 @@
     <div class="container">
       <div class="row">
         <div class="col-12">
-          <div id="message">SocialSense</div>
-      <div class="d-flex">
-        <input class="me-2 rounded p-2" type="text" id="instagramInput" placeholder="Enter Instagram ID" />
-      <!-- Add a submit button with an ID for easier access in JavaScript -->
-      <button class="btn btn-primary" type="button" id="submitBtn">Submit</button>
-      <div class="spinner-border" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      </div>
-      <ul id="instagramList"></ul>
+          <div class="d-flex justify-content-center">
+            <div id="message">SocialSense</div>
+          </div>
+          <div class="d-flex">
+            <select class="custom-select" id="socialMedia">
+              <option value="instagram" selected>Instagram</option>
+              <option value="facebook">Facebook</option>
+              <option value="twitter">Twitter</option>
+              <option value="linkedin">LinkedIn</option>
+            </select>
+            <input type="text" class="form-control me-2" id="instagramInput" placeholder="Enter Instagram ID">
+            <button class="btn btn-primary" type="button" id="submitBtn">Search</button>
+          </div>
+          <ul id="instagramList"></ul>
         </div>
       </div>
     </div>
   </section>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-
 </html>

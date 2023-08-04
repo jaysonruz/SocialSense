@@ -40,10 +40,10 @@ def scrape_instagram_data(instagram_id: str, all_posts: bool = False) -> List[di
     }
 
     if all_posts:
-        print("scraping with slow method !")
+        print("DEBUG: scraping with slow method !")
         run_input = run_input_slow
     else:
-        print(f"scraping with fast method ! for ({instagram_id})")
+        print(f"DEBUG: scraping with fast method ! for ({instagram_id})")
         run_input = run_input_fast
 
     # Run the actor and wait for it to finish

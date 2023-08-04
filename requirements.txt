@@ -18,3 +18,4 @@ apify-client
 regex
 gingerit
 boto3
+cryptography

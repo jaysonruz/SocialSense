@@ -1,0 +1,36 @@
+body {
+    width: 600px;
+    height: 500px;
+    padding: 20px;
+    }
+    #post_image{
+    height: auto;
+    width: 140px;
+    overflow:hidden;
+    padding-bottom:100%;
+    }
+    #message {
+    font-size: 20px;
+    }
+    #instagramInput {
+    margin-top: 10px;
+    width: 70%; /* Adjust the width to leave space for the button */
+    }
+    #submitBtn {
+    margin-top: 10px;
+    width: 30%; /* Adjust the width to leave space for the input field */
+    }
+    #instagramList {
+    margin-top: 10px;
+    list-style-type: none;
+    padding: 0;
+    }
+    #instagramList li {
+    margin-bottom: 5px;
+    }
+    .post-container{
+        background-color: #b7f396;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+    }
