@@ -204,6 +204,7 @@ def fetch_instagram_posts(ig_id: InstagramPostRequest):
         post["displayUrl_hosted"]=f"/imgs/{file_name}"
 
         result.append(post)
+        
     return result
 
 #-----------------------------------------------------------------------------------------------#
