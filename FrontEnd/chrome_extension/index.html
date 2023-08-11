@@ -2,8 +2,7 @@
 <head>
 <title>SocialSense</title>
 <link rel="stylesheet" href="css/bootstrap.min.css">
-	<link rel="stylesheet" href="css/mystyle.css">
-<script src="popup.js"></script>
+<link rel="stylesheet" href="css/mystyle.css">
 <style>
 ul li.red {
     border: 2px solid #FF0000;
@@ -134,79 +133,14 @@ input.form-border {
           <input type="text" class="form-control form-border" id="instagramInput" placeholder="Enter Instagram ID">
           <button class="btn btn-primary search-btn" type="button" id="submitBtn"><img src="images/search.svg" class="img-fluid"></button>
         </div>
-        <ul id="instagramList ">
-			<p class="mt-3 fs-5 fw-medium">Results</p>
-          <li class="red">
-            <div class="row">
-				<div class="col-12">
-					<div class="row position-relative">
-						<div class="right-icon" style="display: none;">
-							<img src="images/right-icon.svg" class="img-fluid">
-						</div>
-						<div class="col-4">
-                <div class="ratio ratio-1x1"> <img id="post_image" src="http://192.168.2.172:80/imgs/3160261204005794456.jpg" class="img-fluid post-img"> </div>
-              </div>
-              <div class="col-8">
-                <p><strong>Caption:</strong> Wishing these 21Ners a <strong class="error-word">happy</strong> #21NERversary! Congratulations on your work milestones! May the coming years be filled with <strong class="error-word">exciting opportunities</strong> and endless success! @benawaghela, <strong class="error-word">@praffulgajula</strong>, @iamtrilokpandey, @nida_khan26</p>
-                <div class="row">
-					<div class="col-6">
-						<p>Total errors: 3</p>
-					</div>
-					<div class="col-6 text-end">
-						<button class="btn btn-primary btn-sm btn1 light-grren fw-bold">Fix errors</button>
-						
-					</div>
-				 </div>
-              </div>
-					</div>
-					<div class="row">
-						<div class="col-12">
-							<div class="fix-error-box position-relative" style="display: none;">
-				  	<p class="fw-bold">Total errors fixed: 3</p>
-					<p id="p1">Wishing these 21Ners a <strong>happy</strong> Congratulations on your work milestones! May the coming years be filled with <strong>exciting opportunities</strong> and endless success!</p>
-				  <p class="copy-icon" onclick="copyToClipboard('#p1')"><img src="images/copy-icon.svg" class="img-fluid"></p>
-				  <div class="d-flex align-items-center">
-				  	<p class="fw-bold me-2 mb-0">Is it helpful?</p>
-					  <button type="button" class="btn btn-primary btn-sm me-2 btn-green btn2">Yes</button>
-					  <button type="button" class="btn btn-primary btn-sm btn-red btn2">No</button>
-				  </div>
-				  
-			</div>
-						</div>
-					</div>
-				</div>
-              
-            </div>
-            <div class="post-container">
-              <div style="flex: 1;"> </div>
-            </div>
-          </li>
-         <li class="no-error">
-            <div class="row">
-              <div class="col-4">
-                <div class="ratio ratio-1x1"> <img id="post_image" src="http://192.168.2.172:80/imgs/3160261204005794456.jpg" class="img-fluid post-img"> </div>
-              </div>
-              <div class="col-8">
-                <p><strong>Caption:</strong> Wishing these 21Ners a happy Congratulations on your work milestones! May the coming years be filled with exciting opportunities and endless success!</p>
-                <div class="row">
-					<div class="col-6">
-						<p>Total errors: 0</p>
-					</div>
-					
-				 </div>
-              
-              </div>
-            </div>
-            <div class="post-container">
-              <div style="flex: 1;"> </div>
-            </div>
-          </li>
-        </ul>
+		<p class="mt-3 fs-5 fw-medium">Results</p>
+        <ul id="instagramList"></ul>
       </div>
     </div>
   </div>
 </section>
 </body>
+<script src="popup.js"></script>
 <script src="js/jquery.min.js"></script>
 <script src="js/extrafunctions.js"></script>
 </html>

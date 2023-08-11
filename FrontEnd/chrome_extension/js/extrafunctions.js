@@ -11,10 +11,20 @@ $(document).ready(function(){
     });
   });
 
-  function copyToClipboard(element) {
-    var $temp = $("<input>");
-    $("body").append($temp);
-    $temp.val($(element).text()).select();
-    document.execCommand("copy");
-    $temp.remove();
+document.addEventListener("DOMContentLoaded", function () {
+  var copyIcon = document.querySelector(".copy-icon img");
+
+  if (copyIcon) {
+    copyIcon.addEventListener("click", function () {
+      copyToClipboard("#p1");
+    });
   }
+});
+
+function copyToClipboard(element) {
+  var $temp = $("<input>");
+  $("body").append($temp);
+  $temp.val($(element).text()).select();
+  document.execCommand("copy");
+  $temp.remove();
+}
