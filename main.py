@@ -110,6 +110,8 @@ class InstagramPostRequest(BaseModel):
 
 #----------------------------------------------------------------------------------------------#
 #------------------------------------------FASTAPI---------------------------------------------#
+server_address="http://192.168.2.172"
+
 origins = [
     "http://127.0.0.1:8000",  # This is the default FastAPI server origin
     "chrome-extension://cdpjgindfjcedmeikjnahnkbpgfkbmpe",  # Replace with your Chrome extension's origin
@@ -201,7 +203,7 @@ def fetch_instagram_posts(ig_id: InstagramPostRequest):
         file_name = f"{post['id']}.jpg" 
         img_save_path = str(STATIC_IMAGES_DIR/file_name)
         download_image(url=post['displayUrl'],save_path=img_save_path)
-        post["displayUrl_hosted"]=f"/imgs/{file_name}"
+        post["displayUrl_hosted"]=f"{server_address}/imgs/{file_name}"
 
         result.append(post)
         

@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const instagramInput = document.getElementById('instagramInput');
     const submitBtn = document.getElementById('submitBtn');
     const instagramList = document.getElementById('instagramList');
-    const backend_url = "http://127.0.0.1:8000";
+    const backend_url = "http://192.168.2.172:80";
   
     submitBtn.addEventListener('click', async function () {
       const inputValue = instagramInput.value;
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const postHTML = `
         <div class="post-container">
           <div >
-          <img id="post_image" src="${backend_url}${post.displayUrl_hosted}">
+          <img id="post_image" src="${post.displayUrl_hosted}">
           </div>
           <div style="flex: 1;">
             <p><strong>URL:</strong> <a href="${post.url}" target="_blank">${post.url}</a></p>
