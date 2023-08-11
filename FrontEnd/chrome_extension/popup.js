@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <p><strong>Caption:</strong>${post.caption}</p>
             <div class="row">
       <div class="col-6">
-        <p>Total errors: 0</p>
+        <p>Total errors: ${post.total_errors}</p>
       </div>
       
      </div>
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <p><strong>Caption:</strong>${post.caption}</p>
                 <div class="row">
 					<div class="col-6">
-						<p>Total errors: 3</p>
+						<p>Total errors: ${post.total_errors}</p>
 					</div>
 					<div class="col-6 text-end">
 						<button class="btn btn-primary btn-sm btn1 light-grren fw-bold">Fix errors</button>
