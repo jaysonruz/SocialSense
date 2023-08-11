@@ -196,6 +196,7 @@ def fetch_instagram_posts(ig_id: InstagramPostRequest):
         print(f"DEBUG: processing {post['id']}")
         gingered_op = fix_my_cap(post['caption'])
         post['any_corrections']= len(gingered_op["corrections"]) > 0
+        post['total_errors']=len(gingered_op["corrections"])
         post['correction_results']=gingered_op["result"]
         post['corrections_list']=gingered_op["corrections"]
 
