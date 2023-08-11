@@ -27,8 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
       igPosts.forEach((post) => {
         const listItem = document.createElement('li');
   
-        const errorFreePostHtml = `
-        <li class="no-error">
+        const errorFreePostHtml = `<li class="no-error">
         <div class="row">
           <div class="col-4">
             <div class="ratio ratio-1x1"> <img id="post_image" src="${post.displayUrl_hosted}" class="img-fluid post-img"> </div>
@@ -47,8 +46,7 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="post-container">
           <div style="flex: 1;"> </div>
         </div>
-      </li>
-      `;
+      </li>`
         const errorPostHTML = `
         <li class="red">
             <div class="row">
