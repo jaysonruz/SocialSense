@@ -113,13 +113,50 @@ document.addEventListener('DOMContentLoaded', async function () {
             $(redBackground).css('background', 'white');
           });
         }
+        // Add event listeners for "Yes" and "No" buttons
+        const yesBtn = listItem.querySelector('.btn-green');
+        const noBtn = listItem.querySelector('.btn-red');
 
+        if (yesBtn) {
+          yesBtn.addEventListener('click', async function () {
+            await sendHelpfulFeedback(post, true);
+          });
+        }
+    
+        if (noBtn) {
+          noBtn.addEventListener('click', async function () {
+            await sendHelpfulFeedback(post, false);
+          });
+        }
         // Add event listeners for other buttons as needed (e.g., .btn2)
       });
     } else {
       console.error('Error fetching Instagram posts:', response.status, response.statusText);
     }
   });
+  
+  async function sendHelpfulFeedback(post, helpful) {
+    const response = await fetch(backend_url + '/save_ig_posts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        "id": post.id,
+        "caption":post.caption,
+        "displayUrl_hosted":post.displayUrl_hosted,
+        "url":post.url,
+        "correction_results":post.correction_results,
+        "helpful": helpful,
+      }),
+    });
+  
+    if (response.ok) {
+      console.log('Feedback sent successfully');
+    } else {
+      console.error('Error sending feedback:', response.status, response.statusText);
+    }
+  }
 
   function highlightCorrectionsInCap(text, corrections_list) {
     corrections_list.forEach((correction) => {

@@ -76,11 +76,12 @@ tb_user_subscriptions = sqlalchemy.Table(
 
 # Define the table for saved Instagram posts
 tb_saved_ig_posts = sqlalchemy.Table(
-    "saved_ig_posts",
+    "ig_posts",
     metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("id", sqlalchemy.String(255), primary_key=True),
     sqlalchemy.Column("caption", sqlalchemy.String(1000), nullable=False),
     sqlalchemy.Column("displayUrl_hosted", sqlalchemy.String(255), nullable=False),
+    sqlalchemy.Column("url", sqlalchemy.String(255), nullable=False),
     sqlalchemy.Column("correction_results", sqlalchemy.String(1000), nullable=False),
     sqlalchemy.Column("helpful", sqlalchemy.Boolean, nullable=False),
 )
@@ -120,9 +121,10 @@ class InstagramPostRequest(BaseModel):
     instagram_id: str
 
 class SavedIgPost(BaseModel):
-    id: int
+    id: str
     caption: str
     displayUrl_hosted: str
+    url:str
     correction_results: str
     helpful: bool
 #----------------------------------------------------------------------------------------------#
@@ -236,15 +238,20 @@ async def save_ig_posts(saved_post: SavedIgPost):
             "id": saved_post.id,
             "caption": saved_post.caption,
             "displayUrl_hosted": saved_post.displayUrl_hosted,
+            "url":saved_post.url,
             "correction_results": saved_post.correction_results,
             "helpful": saved_post.helpful,
         }
-
+        
+        print("DEBUG: ",values)
         # Insert the values into the database
         query = tb_saved_ig_posts.insert().values(**values)
         await database.execute(query)
 
+        print("Instagram post saved successfully:", values)  # Print success message
+
         return {"message": "Instagram post saved successfully"}
     except Exception as e:
         return {"error": str(e)}
+
 #-----------------------------------------------------------------------------------------------#
