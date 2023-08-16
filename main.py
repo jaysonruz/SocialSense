@@ -248,7 +248,7 @@ async def save_ig_posts(saved_post: SavedIgPost):
         query = tb_saved_ig_posts.insert().values(**values)
         await database.execute(query)
 
-        print("Instagram post saved successfully:", values)  # Print success message
+        print("\nDEBUG: Instagram post saved successfully:", values)  # Print success message
 
         return {"message": "Instagram post saved successfully"}
     except Exception as e:
