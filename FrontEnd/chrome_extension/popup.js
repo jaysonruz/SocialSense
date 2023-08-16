@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', async function () {
   const instagramInput = document.getElementById('instagramInput');
   const submitBtn = document.getElementById('submitBtn');
   const instagramList = document.getElementById('instagramList');
-  const backend_url = "http://192.168.2.172:80";
+  // const backend_url = "http://192.168.2.172:80";
+  const backend_url = "http://192.168.1.143:80";
 
   submitBtn.addEventListener('click', async function () {
     const inputValue = instagramInput.value;
