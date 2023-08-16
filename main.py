@@ -74,6 +74,17 @@ tb_user_subscriptions = sqlalchemy.Table(
     sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id"),nullable=False, index=True),
 )
 
+# Define the table for saved Instagram posts
+tb_saved_ig_posts = sqlalchemy.Table(
+    "saved_ig_posts",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("caption", sqlalchemy.String(1000), nullable=False),
+    sqlalchemy.Column("displayUrl_hosted", sqlalchemy.String(255), nullable=False),
+    sqlalchemy.Column("correction_results", sqlalchemy.String(1000), nullable=False),
+    sqlalchemy.Column("helpful", sqlalchemy.Boolean, nullable=False),
+)
+
 #----------------------------------------------------------------------------------------------#
 #------------------------------------------VALIDATORS------------------------------------------#
 class BaseUser(BaseModel):
@@ -108,9 +119,16 @@ class UserSignIn(BaseModel):
 class InstagramPostRequest(BaseModel):
     instagram_id: str
 
+class SavedIgPost(BaseModel):
+    id: int
+    caption: str
+    displayUrl_hosted: str
+    correction_results: str
+    helpful: bool
 #----------------------------------------------------------------------------------------------#
 #------------------------------------------FASTAPI---------------------------------------------#
-server_address="http://192.168.2.172"
+# server_address="http://192.168.2.172"
+server_address="http://192.168.1.143"
 
 origins = [
     "http://127.0.0.1:8000",  # This is the default FastAPI server origin
@@ -210,4 +228,23 @@ def fetch_instagram_posts(ig_id: InstagramPostRequest):
         
     return result
 
+@app.post("/save_ig_posts")
+async def save_ig_posts(saved_post: SavedIgPost):
+    try:
+        # Prepare the values to be inserted into the database
+        values = {
+            "id": saved_post.id,
+            "caption": saved_post.caption,
+            "displayUrl_hosted": saved_post.displayUrl_hosted,
+            "correction_results": saved_post.correction_results,
+            "helpful": saved_post.helpful,
+        }
+
+        # Insert the values into the database
+        query = tb_saved_ig_posts.insert().values(**values)
+        await database.execute(query)
+
+        return {"message": "Instagram post saved successfully"}
+    except Exception as e:
+        return {"error": str(e)}
 #-----------------------------------------------------------------------------------------------#
