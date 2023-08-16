@@ -22,7 +22,7 @@ def scrape_instagram_data(instagram_id: str, all_posts: bool = False) -> List[di
     # Prepare the actor input
     run_input_slow = {
         "directUrls": [f"https://www.instagram.com/{instagram_id}/"],
-        "resultsLimit": 24,
+        "resultsLimit": 50,
         "resultsType": "posts",
         "searchLimit": 1,
         "searchType": "user"
@@ -55,6 +55,7 @@ def scrape_instagram_data(instagram_id: str, all_posts: bool = False) -> List[di
         results.append(item)
         
     if all_posts:
+        # print(results)
         return results
     else:
         return results[0]["latestPosts"] if len(results) >= 1 else []

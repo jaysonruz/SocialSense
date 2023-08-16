@@ -74,6 +74,18 @@ tb_user_subscriptions = sqlalchemy.Table(
     sqlalchemy.Column("user_id", sqlalchemy.ForeignKey("users.id"),nullable=False, index=True),
 )
 
+# Define the table for saved Instagram posts
+tb_saved_ig_posts = sqlalchemy.Table(
+    "ig_posts",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.String(255), primary_key=True),
+    sqlalchemy.Column("caption", sqlalchemy.String(1000), nullable=False),
+    sqlalchemy.Column("displayUrl_hosted", sqlalchemy.String(255), nullable=False),
+    sqlalchemy.Column("url", sqlalchemy.String(255), nullable=False),
+    sqlalchemy.Column("correction_results", sqlalchemy.String(1000), nullable=False),
+    sqlalchemy.Column("helpful", sqlalchemy.Boolean, nullable=False),
+)
+
 #----------------------------------------------------------------------------------------------#
 #------------------------------------------VALIDATORS------------------------------------------#
 class BaseUser(BaseModel):
@@ -108,9 +120,17 @@ class UserSignIn(BaseModel):
 class InstagramPostRequest(BaseModel):
     instagram_id: str
 
+class SavedIgPost(BaseModel):
+    id: str
+    caption: str
+    displayUrl_hosted: str
+    url:str
+    correction_results: str
+    helpful: bool
 #----------------------------------------------------------------------------------------------#
 #------------------------------------------FASTAPI---------------------------------------------#
-server_address="http://192.168.2.172"
+# server_address="http://192.168.2.172"
+server_address="http://192.168.1.143"
 
 origins = [
     "http://127.0.0.1:8000",  # This is the default FastAPI server origin
@@ -194,20 +214,47 @@ def fetch_instagram_posts(ig_id: InstagramPostRequest):
     # returns array of dict
     for post in ig_posts:
         print(f"DEBUG: processing {post['id']}")
-        gingered_op = fix_my_cap(post['caption'])
-        post['any_corrections']= len(gingered_op["corrections"]) > 0
-        post['total_errors']=len(gingered_op["corrections"])
-        post['correction_results']=gingered_op["result"]
-        post['corrections_list']=gingered_op["corrections"]
+        try:
+            gingered_op = fix_my_cap(post['caption'])
+            post['any_corrections']= len(gingered_op["corrections"]) > 0
+            post['total_errors']=len(gingered_op["corrections"])
+            post['correction_results']=gingered_op["result"]
+            post['corrections_list']=gingered_op["corrections"]
+            
+            # dowload img and serve it from local
+            file_name = f"{post['id']}.jpg" 
+            img_save_path = str(STATIC_IMAGES_DIR/file_name)
+            download_image(url=post['displayUrl'],save_path=img_save_path)
+            post["displayUrl_hosted"]=f"{server_address}/imgs/{file_name}"
 
-        # dowload img and serve it from local
-        file_name = f"{post['id']}.jpg" 
-        img_save_path = str(STATIC_IMAGES_DIR/file_name)
-        download_image(url=post['displayUrl'],save_path=img_save_path)
-        post["displayUrl_hosted"]=f"{server_address}/imgs/{file_name}"
-
-        result.append(post)
-        
+            result.append(post)
+        except:
+            print("ERROR: fields like caption not found in post: {post}")
+            continue
     return result
+
+@app.post("/save_ig_posts")
+async def save_ig_posts(saved_post: SavedIgPost):
+    try:
+        # Prepare the values to be inserted into the database
+        values = {
+            "id": saved_post.id,
+            "caption": saved_post.caption,
+            "displayUrl_hosted": saved_post.displayUrl_hosted,
+            "url":saved_post.url,
+            "correction_results": saved_post.correction_results,
+            "helpful": saved_post.helpful,
+        }
+        
+        print("DEBUG: ",values)
+        # Insert the values into the database
+        query = tb_saved_ig_posts.insert().values(**values)
+        await database.execute(query)
+
+        print("\nDEBUG: Instagram post saved successfully:", values)  # Print success message
+
+        return {"message": "Instagram post saved successfully"}
+    except Exception as e:
+        return {"error": str(e)}
 
 #-----------------------------------------------------------------------------------------------#
