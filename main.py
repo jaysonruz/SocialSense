@@ -214,20 +214,23 @@ def fetch_instagram_posts(ig_id: InstagramPostRequest):
     # returns array of dict
     for post in ig_posts:
         print(f"DEBUG: processing {post['id']}")
-        gingered_op = fix_my_cap(post['caption'])
-        post['any_corrections']= len(gingered_op["corrections"]) > 0
-        post['total_errors']=len(gingered_op["corrections"])
-        post['correction_results']=gingered_op["result"]
-        post['corrections_list']=gingered_op["corrections"]
+        try:
+            gingered_op = fix_my_cap(post['caption'])
+            post['any_corrections']= len(gingered_op["corrections"]) > 0
+            post['total_errors']=len(gingered_op["corrections"])
+            post['correction_results']=gingered_op["result"]
+            post['corrections_list']=gingered_op["corrections"]
+            
+            # dowload img and serve it from local
+            file_name = f"{post['id']}.jpg" 
+            img_save_path = str(STATIC_IMAGES_DIR/file_name)
+            download_image(url=post['displayUrl'],save_path=img_save_path)
+            post["displayUrl_hosted"]=f"{server_address}/imgs/{file_name}"
 
-        # dowload img and serve it from local
-        file_name = f"{post['id']}.jpg" 
-        img_save_path = str(STATIC_IMAGES_DIR/file_name)
-        download_image(url=post['displayUrl'],save_path=img_save_path)
-        post["displayUrl_hosted"]=f"{server_address}/imgs/{file_name}"
-
-        result.append(post)
-        
+            result.append(post)
+        except:
+            print("ERROR: fields like caption not found in post: {post}")
+            continue
     return result
 
 @app.post("/save_ig_posts")
