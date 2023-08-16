@@ -120,12 +120,16 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (yesBtn) {
           yesBtn.addEventListener('click', async function () {
             await sendHelpfulFeedback(post, true);
+            $(fixErrorsBox).slideUp();
+            $(redBackground).css('background', 'white');
           });
         }
     
         if (noBtn) {
           noBtn.addEventListener('click', async function () {
             await sendHelpfulFeedback(post, false);
+            $(fixErrorsBox).slideUp();
+            $(redBackground).css('background', 'white');
           });
         }
         // Add event listeners for other buttons as needed (e.g., .btn2)
