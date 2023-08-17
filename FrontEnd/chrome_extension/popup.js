@@ -185,10 +185,16 @@ document.addEventListener('DOMContentLoaded', async function () {
     tempInput.select();
     document.execCommand('copy');
     document.body.removeChild(tempInput);
-  
-    // Display a notification or provide some feedback to the user
-    alert('Correction results copied to clipboard!');
-  }
+
+    // Show the notification
+    const notification = document.querySelector('.notification');
+    notification.classList.add('show');
+
+    // Automatically hide the notification after a certain time
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000); // Hide after 3 seconds
+}
 
   function highlightCorrectionsInCap(text, corrections_list) {
     corrections_list.forEach((correction) => {
