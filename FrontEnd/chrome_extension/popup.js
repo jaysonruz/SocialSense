@@ -80,7 +80,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 							<div class="fix-error-box position-relative" style="display: none;">
 				  	<p class="fw-bold">Total errors fixed: ${post.total_errors}</p>
 					<p id="p1">${highlightCorrectionsInRes(post.correction_results, post.corrections_list)}</p>
-				  <p class="copy-icon"><img src="images/copy-icon.svg" class="img-fluid"></p>
+				  <p class="copy-icon">
+            <img id="copyButton" src="images/copy-icon.svg" class="img-fluid">
+          </p>
 				  <div class="d-flex align-items-center">
 				  	<p class="fw-bold me-2 mb-0">Is it helpful?</p>
 					  <button type="button" class="btn btn-primary btn-sm me-2 btn-green btn2">Yes</button>
@@ -112,7 +114,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         const fixErrorsBox = listItem.querySelector('.fix-error-box');
         const redBackground = listItem.querySelector('.red');
         const rightIcon = listItem.querySelector('.right-icon');
-
+        
         if (fixErrorsBtn) {
           fixErrorsBtn.addEventListener('click', function () {
             $(fixErrorsBox).slideDown();
@@ -136,6 +138,14 @@ document.addEventListener('DOMContentLoaded', async function () {
             await sendHelpfulFeedback(post, false);
             $(fixErrorsBox).slideUp();
             $(redBackground).css('background', 'white');
+          });
+        }
+
+        // Add event listener for the copy icon button
+        const copyButton = listItem.querySelector('#copyButton');
+        if (copyButton) {
+          copyButton.addEventListener('click', function () {
+            copyCorrectionResults(post.correction_results);
           });
         }
         // Add event listeners for other buttons as needed (e.g., .btn2)
@@ -167,6 +177,18 @@ document.addEventListener('DOMContentLoaded', async function () {
       console.error('Error sending feedback:', response.status, response.statusText);
     }
   }
+  
+  function copyCorrectionResults(text) {
+    const tempInput = document.createElement('textarea');
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+  
+    // Display a notification or provide some feedback to the user
+    alert('Correction results copied to clipboard!');
+  }
 
   function highlightCorrectionsInCap(text, corrections_list) {
     corrections_list.forEach((correction) => {
@@ -177,6 +199,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
     return text;
   }
+
   function highlightCorrectionsInRes(text, corrections_list) {
     corrections_list.forEach((correction) => {
       const originalText = correction.correct; // higlight corrected words 
