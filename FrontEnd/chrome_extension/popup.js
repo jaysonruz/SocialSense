@@ -2,11 +2,17 @@ document.addEventListener('DOMContentLoaded', async function () {
   const instagramInput = document.getElementById('instagramInput');
   const submitBtn = document.getElementById('submitBtn');
   const instagramList = document.getElementById('instagramList');
-  // const backend_url = "http://192.168.2.172:80";
-  const backend_url = "http://192.168.1.143:80";
+  const backend_url = "http://192.168.2.172:80";
+  // const backend_url = "http://192.168.1.143:80";
 
   submitBtn.addEventListener('click', async function () {
     const inputValue = instagramInput.value;
+    instagramList.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>`;
 
     const response = await fetch(backend_url + '/instagram_posts', {
       method: 'POST',

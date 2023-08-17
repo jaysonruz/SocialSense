@@ -129,8 +129,8 @@ class SavedIgPost(BaseModel):
     helpful: bool
 #----------------------------------------------------------------------------------------------#
 #------------------------------------------FASTAPI---------------------------------------------#
-# server_address="http://192.168.2.172"
-server_address="http://192.168.1.143"
+server_address="http://192.168.2.172"
+# server_address="http://192.168.1.143"
 
 origins = [
     "http://127.0.0.1:8000",  # This is the default FastAPI server origin
