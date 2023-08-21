@@ -5,6 +5,14 @@ document.addEventListener('DOMContentLoaded', async function () {
   const backend_url = "http://192.168.2.172:80";
   // const backend_url = "http://192.168.1.143:80";
 
+  // Add event listener for the "keydown" event on the input field
+  instagramInput.addEventListener('keydown', function (event) {
+    if (event.key === "Enter") {
+      event.preventDefault(); // Prevent default behavior of Enter key (like line break)
+      submitBtn.click(); // Programmatically click the submit button
+    }
+  });
+
   submitBtn.addEventListener('click', async function () {
     const inputValue = instagramInput.value;
     instagramList.innerHTML = `
@@ -13,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         <span class="visually-hidden">Loading...</span>
       </div>
     </div>`;
-
+    
     const response = await fetch(backend_url + '/instagram_posts', {
       method: 'POST',
       headers: {
@@ -24,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       }),
     });
 
+    
     if (response.ok) {
       const igPosts = await response.json();
 
