@@ -66,20 +66,20 @@ document.addEventListener('DOMContentLoaded', async function () {
                               <img id="post_image" src="${post.displayUrl_hosted}" class="img-fluid post-img">
                           </div>
                       </div>
-                      <div class="col-8">
+                      <div class="col-8 pe-3">
                           <p><strong>Caption:</strong><span class="caption">${highlightCorrectionsInCap(post.caption, post.corrections_list)}</span></p>
-                          <div class="row">
-                              <div class="col-6">
-                                  <p>Total errors: ${post.total_errors}</p>
+                          <div class="row align-items-center">
+                              <div class="col-5">
+                                  <p class="mb-0">Total errors: ${post.total_errors}</p>
                               </div>
-                              <div class="col-6 text-end">
+                              <div class="col-7 d-flex text-end">
                                   <button class="btn btn-primary btn-sm btn1 light-grren fw-bold">Fix errors</button>
                                   <button class="btn btn-secondary btn-sm btn2 light-red fw-bold ms-2">Dismiss</button>
                               </div>
                           </div>
                       </div>
                   </div>
-                  <div class="row">
+                  <div class="row mt-3">
                       <div class="col-12">
                           <div class="fix-error-box position-relative" style="display: none;">
                               <p class="fw-bold">Total errors fixed: ${post.total_errors}</p>
@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             await sendHelpfulFeedback(post, helpful=false,dismiss=true);
             $(fixErrorsBox).slideUp();
             $(redBackground).css('background', 'white');
+            $(rightIcon).css('display', 'block');
           });
         }
 
@@ -144,6 +145,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             await sendHelpfulFeedback(post, true);
             $(fixErrorsBox).slideUp();
             $(redBackground).css('background', 'white');
+            $(rightIcon).css('display', 'block');
           });
         }
     
@@ -152,6 +154,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             await sendHelpfulFeedback(post, false);
             $(fixErrorsBox).slideUp();
             $(redBackground).css('background', 'white');
+            $(rightIcon).css('display', 'block');
           });
         }
 
