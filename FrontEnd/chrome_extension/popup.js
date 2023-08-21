@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
       // Create and append new list items for each post in the response
       igPosts.forEach((post) => {
+        console.log(post);
         const listItem = document.createElement('li');
 
         const errorFreePostHtml = `<li class="no-error">
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 					</div>
 					<div class="col-6 text-end">
 						<button class="btn btn-primary btn-sm btn1 light-grren fw-bold">Fix errors</button>
+            <button class="btn btn-secondary btn-sm btn2 light-red fw-bold ms-2">Dismiss</button>
 					</div>
 				 </div>
               </div>
@@ -111,6 +113,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Add event listener for the "Fix errors" button
         const fixErrorsBtn = listItem.querySelector('.btn1');
+        const dismissBtn = listItem.querySelector('.btn2');
         const fixErrorsBox = listItem.querySelector('.fix-error-box');
         const redBackground = listItem.querySelector('.red');
         const rightIcon = listItem.querySelector('.right-icon');
@@ -124,6 +127,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Add event listeners for "Yes" and "No" buttons
         const yesBtn = listItem.querySelector('.btn-green');
         const noBtn = listItem.querySelector('.btn-red');
+
+        if (dismissBtn) {
+          dismissBtn.addEventListener('click', async function () {
+            await sendHelpfulFeedback(post, helpful=false,dismiss=true);
+            $(fixErrorsBox).slideUp();
+            $(redBackground).css('background', 'white');
+          });
+        }
 
         if (yesBtn) {
           yesBtn.addEventListener('click', async function () {
@@ -155,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
   });
   
-  async function sendHelpfulFeedback(post, helpful) {
+  async function sendHelpfulFeedback(post, helpful, dismiss=false) {
     const response = await fetch(backend_url + '/save_ig_posts', {
       method: 'POST',
       headers: {
@@ -168,6 +179,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         "url":post.url,
         "correction_results":post.correction_results,
         "helpful": helpful,
+        "dismiss": dismiss,
       }),
     });
   
@@ -208,6 +220,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   function highlightCorrectionsInRes(text, corrections_list) {
     corrections_list.forEach((correction) => {
+      //console.log(correction);
       const originalText = correction.correct; // higlight corrected words 
       const regex = new RegExp(`\\b${originalText}\\b`, 'gi');
       console.log(`DEBUG: IN RESULT: Corrected Text: ${originalText}`);
