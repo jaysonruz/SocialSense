@@ -53,52 +53,55 @@ document.addEventListener('DOMContentLoaded', async function () {
           <div style="flex: 1;"> </div>
         </div>
       </li>`;
-        const errorPostHTML = `
-        <li class="red">
-            <div class="row">
-				<div class="col-12">
-					<div class="row position-relative">
-						<div class="right-icon" style="display: none;">
-							<img src="images/right-icon.svg" class="img-fluid">
-						</div>
-						<div class="col-4">
-                <div class="ratio ratio-1x1"> <img id="post_image" src="${post.displayUrl_hosted}" class="img-fluid post-img"> </div>
+      const errorPostHTML = `
+      <li class="red">
+          <div class="row">
+              <div class="col-12">
+                  <div class="row position-relative">
+                      <div class="right-icon" style="display: none;">
+                          <img src="images/right-icon.svg" class="img-fluid">
+                      </div>
+                      <div class="col-4">
+                          <div class="ratio ratio-1x1">
+                              <img id="post_image" src="${post.displayUrl_hosted}" class="img-fluid post-img">
+                          </div>
+                      </div>
+                      <div class="col-8">
+                          <p><strong>Caption:</strong><span class="caption">${highlightCorrectionsInCap(post.caption, post.corrections_list)}</span></p>
+                          <div class="row">
+                              <div class="col-6">
+                                  <p>Total errors: ${post.total_errors}</p>
+                              </div>
+                              <div class="col-6 text-end">
+                                  <button class="btn btn-primary btn-sm btn1 light-grren fw-bold">Fix errors</button>
+                                  <button class="btn btn-secondary btn-sm btn2 light-red fw-bold ms-2">Dismiss</button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-12">
+                          <div class="fix-error-box position-relative" style="display: none;">
+                              <p class="fw-bold">Total errors fixed: ${post.total_errors}</p>
+                              <p id="p1">${highlightCorrectionsInRes(post.correction_results, post.corrections_list)}</p>
+                              <p class="copy-icon">
+                                  <img id="copyButton" src="images/copy-icon.svg" class="img-fluid">
+                              </p>
+                              <div class="d-flex align-items-center">
+                                  <p class="fw-bold me-2 mb-0">Is it helpful?</p>
+                                  <button type="button" class="btn btn-primary btn-sm me-2 btn-green btn2">Yes</button>
+                                  <button type="button" class="btn btn-primary btn-sm btn-red btn2">No</button>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
               </div>
-              <div class="col-8">
-                <p><strong>Caption:</strong><span class="caption">${highlightCorrectionsInCap(post.caption, post.corrections_list)}</span></p>
-                <div class="row">
-					<div class="col-6">
-						<p>Total errors: ${post.total_errors}</p>
-					</div>
-					<div class="col-6 text-end">
-						<button class="btn btn-primary btn-sm btn1 light-grren fw-bold">Fix errors</button>
-            <button class="btn btn-secondary btn-sm btn2 light-red fw-bold ms-2">Dismiss</button>
-					</div>
-				 </div>
-              </div>
-					</div>
-					<div class="row">
-						<div class="col-12">
-							<div class="fix-error-box position-relative" style="display: none;">
-				  	<p class="fw-bold">Total errors fixed: ${post.total_errors}</p>
-					<p id="p1">${highlightCorrectionsInRes(post.correction_results, post.corrections_list)}</p>
-				  <p class="copy-icon">
-            <img id="copyButton" src="images/copy-icon.svg" class="img-fluid">
-          </p>
-				  <div class="d-flex align-items-center">
-				  	<p class="fw-bold me-2 mb-0">Is it helpful?</p>
-					  <button type="button" class="btn btn-primary btn-sm me-2 btn-green btn2">Yes</button>
-					  <button type="button" class="btn btn-primary btn-sm btn-red btn2">No</button>
-				  </div>
-			</div>
-						</div>
-					</div>
-				</div>
-            </div>
-            <div class="post-container">
+          </div>
+          <div class="post-container">
               <div style="flex: 1;"> </div>
-            </div>
-          </li>`;
+          </div>
+      </li>`;
+  
 
         // Conditionally set the PostHTML based on the value of post.any_corrections
         let postHTML;
@@ -211,21 +214,26 @@ document.addEventListener('DOMContentLoaded', async function () {
   function highlightCorrectionsInCap(text, corrections_list) {
     corrections_list.forEach((correction) => {
       const originalText = correction.text;    // highlight words to be corrected 
-      const regex = new RegExp(`\\b${originalText}\\b`, 'gi');
-      console.log(`DEBUG: IN CAPTION: Original Text: ${originalText}`);
-      text = text.replace(regex, `<span class="highlight">${originalText}</span>`);
+      const regex = new RegExp(`\\b${escapeRegex(originalText)}\\b`, 'gi');
+      text = text.replace(regex, `<span class="highlight"> ${originalText} </span>`);
     });
     return text;
   }
 
   function highlightCorrectionsInRes(text, corrections_list) {
     corrections_list.forEach((correction) => {
-      //console.log(correction);
-      const originalText = correction.correct; // higlight corrected words 
-      const regex = new RegExp(`\\b${originalText}\\b`, 'gi');
-      console.log(`DEBUG: IN RESULT: Corrected Text: ${originalText}`);
-      text = text.replace(regex, `<span class="highlight">${originalText}</span>`);
+        const originalText = correction.correct;
+        const regex = new RegExp(`\\b${escapeRegex(originalText)}\\b`, 'gi');
+        text = text.replace(regex, `<span class="highlight">$&</span>`);
     });
     return text;
-  }
+}
+
+// Function to escape special characters in a regular expression
+function escapeRegex(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+
+
 });
