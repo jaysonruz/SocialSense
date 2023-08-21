@@ -1,6 +1,11 @@
+import os
 import requests
 
 def download_image(url, save_path):
+    if os.path.exists(save_path):
+        print("DEBUG: Image already exists at", save_path)
+        return
+
     try:
         response = requests.get(url, stream=True)
         if response.status_code == 200:
