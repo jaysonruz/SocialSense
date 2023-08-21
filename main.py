@@ -84,6 +84,7 @@ tb_saved_ig_posts = sqlalchemy.Table(
     sqlalchemy.Column("url", sqlalchemy.String(255), nullable=False),
     sqlalchemy.Column("correction_results", sqlalchemy.String(1000), nullable=False),
     sqlalchemy.Column("helpful", sqlalchemy.Boolean, nullable=False),
+    sqlalchemy.Column("dismiss", sqlalchemy.Boolean, nullable=False, server_default=sqlalchemy.sql.expression.false()),
 )
 
 #----------------------------------------------------------------------------------------------#
@@ -127,6 +128,7 @@ class SavedIgPost(BaseModel):
     url:str
     correction_results: str
     helpful: bool
+    dismiss: bool
 #----------------------------------------------------------------------------------------------#
 #------------------------------------------FASTAPI---------------------------------------------#
 server_address="http://192.168.2.172"
@@ -244,6 +246,7 @@ async def save_ig_posts(saved_post: SavedIgPost):
             "url":saved_post.url,
             "correction_results": saved_post.correction_results,
             "helpful": saved_post.helpful,
+            "dismiss": saved_post.dismiss,
         }
         
         print("DEBUG: ",values)
