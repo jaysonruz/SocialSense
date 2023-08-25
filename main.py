@@ -212,7 +212,7 @@ async def user_login(user: UserSignIn):
 @app.post("/instagram_posts")
 def fetch_instagram_posts(ig_id: InstagramPostRequest):
     result = []
-    ig_posts= scrape_instagram_data(instagram_id=ig_id.instagram_id,all_posts=False)
+    ig_posts= scrape_instagram_data(instagram_id=ig_id.instagram_id.strip(),all_posts=False)
     # returns array of dict
     for post in ig_posts:
         print(f"DEBUG: processing {post['id']}")
