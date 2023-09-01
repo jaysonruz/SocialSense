@@ -19,3 +19,4 @@ regex
 gingerit
 boto3
 cryptography
+python-jose
