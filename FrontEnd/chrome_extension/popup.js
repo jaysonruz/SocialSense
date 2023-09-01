@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const inputValue = instagramInput.value;
     instagramList.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;">
+      <p style="margin-bottom: 10px;">This should take a minute, you can get back to your work and we will drop you a notification once this is ready</p>
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
@@ -35,6 +36,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     
     if (response.ok) {
       const igPosts = await response.json();
+
+      // Calculate the number of results
+      const resultCount = igPosts.length;
+
+      // Update the result count in the <p> element
+      const resultCountElement = document.getElementById('resultCount');
+      resultCountElement.textContent = `Results: ${resultCount}`;
 
       // Clear the existing list items
       instagramList.innerHTML = '';
@@ -97,9 +105,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                                   <img id="copyButton" src="images/copy-icon.svg" class="img-fluid">
                               </p>
                               <div class="d-flex align-items-center">
-                                  <p class="fw-bold me-2 mb-0">Is it helpful?</p>
-                                  <button type="button" class="btn btn-primary btn-sm me-2 btn-green btn2">Yes</button>
-                                  <button type="button" class="btn btn-primary btn-sm btn-red btn2">No</button>
+                                  <button type="button" class="btn btn-primary btn-sm me-2 btn-green btn2">Accept feedback</button>
+                                  <button type="button" class="btn btn-primary btn-sm btn-red btn2">Ignore feedback</button>
                               </div>
                           </div>
                       </div>
@@ -150,6 +157,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
 
         if (yesBtn) {
+          yesBtn.addEventListener('mouseenter', function () {
+            yesBtn.setAttribute('title', "This will give us data that our QC bot corrected something good");
+          });
+        
+          yesBtn.addEventListener('mouseout', function () {
+            yesBtn.removeAttribute('title');
+          });
+
           yesBtn.addEventListener('click', async function () {
             await sendHelpfulFeedback(post, true);
             $(fixErrorsBox).slideUp();
@@ -159,6 +174,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     
         if (noBtn) {
+          noBtn.addEventListener('mouseenter', function () {
+            noBtn.setAttribute('title', " this will give us feedback that our bots recommendation was ignored ");
+          });
+        
+          noBtn.addEventListener('mouseout', function () {
+            noBtn.removeAttribute('title');
+          });
+
           noBtn.addEventListener('click', async function () {
             await sendHelpfulFeedback(post, false);
             $(fixErrorsBox).slideUp();
