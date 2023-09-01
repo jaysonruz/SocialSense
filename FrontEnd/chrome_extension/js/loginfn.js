@@ -1,6 +1,17 @@
 document.addEventListener('DOMContentLoaded', function () {
     const backend_url = "http://192.168.2.172:80";
     
+    // Check if the JWT token exists in localStorage
+    const jwtToken = localStorage.getItem('jwtToken');
+
+    // Define the URL for the main content (e.g., index.html)
+    const mainContentURL = 'index.html';
+
+    // If JWT token exists, redirect to the main content
+    if (jwtToken) {
+        window.location.href = mainContentURL;
+    }
+
     // References to the login and registration forms
     const loginForm = document.getElementById('loginForm');
     const registrationForm = document.getElementById('registrationForm');
@@ -21,6 +32,14 @@ document.addEventListener('DOMContentLoaded', function () {
         loginForm.style.display = 'block';
     });
 
+    // Function to handle JWT token
+    function handleJwtToken(token) {
+        // You can store the token in localStorage or sessionStorage for future requests
+        console.log("Token saved!");
+
+        localStorage.setItem('jwtToken', token);
+    }
+
     // Add event listener to the login form
     loginForm.addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent form submission
@@ -29,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
 
-        // Send a request to your backend for authentication (similar to your previous code)
+        // Send a request to your backend for authentication
         fetch(backend_url + '/login', {
             method: 'POST',
             headers: {
@@ -40,8 +59,11 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => {
             if (response.ok) {
                 // Successful login
-                console.log('Login successful');
-                window.location.href = 'index.html'; // Redirect to index.html
+                response.json().then(data => {
+                    handleJwtToken(data.access_token);
+                    console.log('Login successful');
+                    window.location.href = mainContentURL; // Redirect to main content (index.html)
+                });
             } else {
                 // Failed login
                 console.error('Login failed');
@@ -73,10 +95,12 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(response => {
             if (response.ok) {
                 // Successful registration
-                console.log('Registration successful');
-                alert('Registration successful. You can now login.');
-                registrationForm.style.display = 'none';
-                loginForm.style.display = 'block';
+                response.json().then(data => {
+                    console.log('Registration successful');
+                    alert('Registration successful. You can now login.');
+                    registrationForm.style.display = 'none';
+                    loginForm.style.display = 'block';
+                });
             } else {
                 // Failed registration
                 console.error('Registration failed');
