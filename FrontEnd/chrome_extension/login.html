@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Include your CSS stylesheets and other necessary elements -->
+</head>
+<body>
+    <!-- Login Form -->
+    <div id="loginForm">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <input type="email" id="loginEmail" placeholder="Email" required>
+            <input type="password" id="loginPassword" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="#" id="showRegistrationForm">Register</a></p>
+    </div>
+
+    <!-- Registration Form -->
+    <div id="registrationForm" style="display: none;">
+        <h2>Register</h2>
+        <form id="registerForm">
+            <input type="email" id="registerEmail" placeholder="Email" required>
+            <input type="text" id="registerFirstName" placeholder="First Name" required>
+            <input type="text" id="registerLastName" placeholder="Last Name" required>
+            <input type="password" id="registerPassword" placeholder="Password" required>
+            <button type="submit">Register</button>
+        </form>
+        <p>Already have an account? <a href="#" id="showLoginForm">Login</a></p>
+    </div>
+
+    <!-- Include your JavaScript to handle form submissions and toggling between forms -->
+    <script src="js/loginfn.js"></script>
+</body>
+</html>
