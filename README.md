@@ -1,5 +1,11 @@
 
 # Useful Commands:
+## virtual environment
+- python -m venv .venv 
+
+## install requirements
+- pip install -r requirements.txt
+
 ## alembic commands
 - alembic init migrations
 - alembic revision --autogenerate -m "initial"
