@@ -1,11 +1,7 @@
 
 # Useful Commands:
 ## virtual environment
-<<<<<<< HEAD
-- python -m venv .venv 
-=======
 - python -m venv .venv
->>>>>>> 746f198efc841eefb246ea74eb8d915ede8d776a
 
 ## install requirements
 - pip install -r requirements.txt
