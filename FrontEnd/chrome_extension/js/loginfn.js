@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
     const backend_url = "http://192.168.2.172:80";
     
     // Define the URL for the main content (e.g., index.html)
@@ -11,6 +11,33 @@ document.addEventListener('DOMContentLoaded', function () {
     // References to the show/hide registration/login links
     const showRegistrationLink = document.getElementById('showRegistrationForm');
     const showLoginLink = document.getElementById('showLoginForm');
+
+    //#-------------------------------
+    const jwtToken = localStorage.getItem('jwtToken');
+    console.log(`jwtToken is in local storage: ${jwtToken}`);
+
+    // Check if a JWT token exists in local storage
+    if (jwtToken) {
+      // Send the token to the /validate_token endpoint for validation
+      const response = await fetch(backend_url + '/validate_token', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${jwtToken}` // Include the JWT token in the Authorization header
+        },
+      });
+
+      if (response.ok) {
+        // Token is valid, you can perform auto-login actions here
+        console.log('Token is valid. Auto-login successful.');
+        // Redirect to your main content or perform other auto-login actions
+        window.location.href = 'index.html';
+      } else {
+        // Token is invalid or expired, remove it from local storage
+        console.error('Token is invalid or expired.');
+        localStorage.removeItem('jwtToken');
+      }
+    }
+    //#-----------------------------------
 
     // Add event listener to show the registration form
     showRegistrationLink.addEventListener('click', function () {

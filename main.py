@@ -293,3 +293,13 @@ async def save_ig_posts(saved_post: SavedIgPost, token: dict = Depends(verify_to
         return {"message": "Instagram post saved successfully"}
     except Exception as e:
         return {"error": str(e)}
+
+@app.post("/validate_token")
+async def validate_token(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        print("DEBUG: TOKEN Validated")
+        return {"valid": True}
+    except jwt.PyJWTError:
+        print("DEBUG: TOKEN Rejected")
+        raise HTTPException(status_code=401, detail="Invalid credentials")
