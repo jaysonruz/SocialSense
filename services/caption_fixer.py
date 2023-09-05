@@ -1,5 +1,6 @@
 import regex as re
-from gingerit.gingerit import GingerIt
+# from gingerit.gingerit import GingerIt
+from services.local_gingerit import GingerIt # import locally
 
 def remove_emoticons_hashtags_tags(text):
     # Remove emoticons
@@ -17,13 +18,13 @@ def remove_emoticons_hashtags_tags(text):
     
     return text.strip()
 
-def check_correction_type(correction):
-    excluded_correction_types = ['Accept space','Accept comma addition','None']
-    for correction in ginger_cap['corrections']:
-        print("\t ------------------",correction['definition'])
-        if correction['definition'] in excluded_correction_types:
-            return False
-    return True
+# def check_correction_type(correction):
+#     excluded_correction_types = ['Accept space','Accept comma addition','None']
+#     for correction in ginger_cap['corrections']:
+#         print("\t ------------------",correction['definition'])
+#         if correction['definition'] in excluded_correction_types:
+#             return False
+#     return True
 
 def fix_my_cap(text):
     """
