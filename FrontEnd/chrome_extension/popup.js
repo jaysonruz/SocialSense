@@ -4,34 +4,44 @@ document.addEventListener('DOMContentLoaded', async function () {
   const instagramList = document.getElementById('instagramList');
   const extensionId = chrome.runtime.id;
   const backend_url = "http://192.168.2.172:80";
-  // const backend_url = "http://192.168.1.143:80";
+  
+  // Common headers for fetch requests
+  const fetchHeaders = {
+      'Content-Type': 'application/json',
+  };
+
+  // Check if the JWT token exists in localStorage
+  const jwtToken = localStorage.getItem('jwtToken');
+
+  // If JWT token exists, add it to the headers
+  if (jwtToken) {
+      fetchHeaders['Authorization'] = `Bearer ${jwtToken}`;
+  }
 
   // Add event listener for the "keydown" event on the input field
   instagramInput.addEventListener('keydown', function (event) {
-    if (event.key === "Enter") {
-      event.preventDefault(); // Prevent default behavior of Enter key (like line break)
-      submitBtn.click(); // Programmatically click the submit button
-    }
+      if (event.key === "Enter") {
+          event.preventDefault(); // Prevent default behavior of Enter key (like line break)
+          submitBtn.click(); // Programmatically click the submit button
+      }
   });
 
   submitBtn.addEventListener('click', async function () {
     const inputValue = instagramInput.value;
-    instagramList.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;">
-      <p style="margin-bottom: 10px;">This should take a minute, you can get back to your work and we will drop you a notification once this is ready</p>
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
+    instagramList.innerHTML = ` 
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%; text-align: center;">
+        <p style="margin-bottom: 100px;">This should take a minute, you can get back to your work and we will drop you a notification once this is ready</p>
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden"></span>
+        </div>
     </div>`;
-    
+
     const response = await fetch(backend_url + '/instagram_posts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        instagram_id: inputValue,
-      }),
+        method: 'POST',
+        headers: fetchHeaders, // Use the common headers
+        body: JSON.stringify({
+            instagram_id: inputValue,
+        }),
     });
 
     
@@ -208,9 +218,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   async function sendHelpfulFeedback(post, helpful, dismiss=false) {
     const response = await fetch(backend_url + '/save_ig_posts', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: fetchHeaders,
       body: JSON.stringify({
         "post_id": post.id,
         "ownerUsername":post.ownerUsername,
