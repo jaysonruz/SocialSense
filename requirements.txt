@@ -16,7 +16,7 @@ pyjwt
 python-dotenv
 apify-client
 regex
-gingerit
 boto3
 cryptography
 python-jose
+python-multipart
