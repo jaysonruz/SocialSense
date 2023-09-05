@@ -78,13 +78,23 @@ tb_user_subscriptions = sqlalchemy.Table(
 tb_saved_ig_posts = sqlalchemy.Table(
     "ig_posts",
     metadata,
-    sqlalchemy.Column("id", sqlalchemy.String(255), primary_key=True),
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column("post_id", sqlalchemy.String(255), nullable=False), # made primary-key false
+    sqlalchemy.Column("ownerUsername", sqlalchemy.String(100), nullable=False),
+    sqlalchemy.Column("extensionId", sqlalchemy.String(100), nullable=False), # extension id 
     sqlalchemy.Column("caption", sqlalchemy.String(1000), nullable=False),
     sqlalchemy.Column("displayUrl_hosted", sqlalchemy.String(255), nullable=False),
     sqlalchemy.Column("url", sqlalchemy.String(255), nullable=False),
     sqlalchemy.Column("correction_results", sqlalchemy.String(1000), nullable=False),
     sqlalchemy.Column("helpful", sqlalchemy.Boolean, nullable=False),
     sqlalchemy.Column("dismiss", sqlalchemy.Boolean, nullable=False, server_default=sqlalchemy.sql.expression.false()),
+    sqlalchemy.Column(
+        "updated_at",
+        sqlalchemy.DateTime,
+        nullable=False,
+        server_default=sqlalchemy.func.now(),
+        onupdate=sqlalchemy.func.now(),
+    ),
 )
 
 #----------------------------------------------------------------------------------------------#
@@ -122,7 +132,9 @@ class InstagramPostRequest(BaseModel):
     instagram_id: str
 
 class SavedIgPost(BaseModel):
-    id: str
+    post_id: str
+    ownerUsername: str
+    extensionId:str
     caption: str
     displayUrl_hosted: str
     url:str
@@ -240,7 +252,9 @@ async def save_ig_posts(saved_post: SavedIgPost):
     try:
         # Prepare the values to be inserted into the database
         values = {
-            "id": saved_post.id,
+            "post_id": saved_post.post_id,
+            "ownerUsername": saved_post.ownerUsername,
+            "extensionId":saved_post.extensionId,
             "caption": saved_post.caption,
             "displayUrl_hosted": saved_post.displayUrl_hosted,
             "url":saved_post.url,

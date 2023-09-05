@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   const instagramInput = document.getElementById('instagramInput');
   const submitBtn = document.getElementById('submitBtn');
   const instagramList = document.getElementById('instagramList');
+  const extensionId = chrome.runtime.id;
   const backend_url = "http://192.168.2.172:80";
   // const backend_url = "http://192.168.1.143:80";
 
@@ -211,7 +212,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        "id": post.id,
+        "post_id": post.id,
+        "ownerUsername":post.ownerUsername,
+        "extensionId": extensionId,
         "caption":post.caption,
         "displayUrl_hosted":post.displayUrl_hosted,
         "url":post.url,
@@ -223,6 +226,8 @@ document.addEventListener('DOMContentLoaded', async function () {
   
     if (response.ok) {
       console.log('Feedback sent successfully');
+      
+      console.log(`Extension ID: ${extensionId}`);
     } else {
       console.error('Error sending feedback:', response.status, response.statusText);
     }
