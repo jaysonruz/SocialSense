@@ -4,7 +4,7 @@
   "description": "A simple Chrome extension that displays Instagram posts and its corrections.",
   "manifest_version": 3,
   "action": {
-    "default_popup": "login.html",
+    "default_popup": "index.html",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
