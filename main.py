@@ -150,11 +150,11 @@ class SavedIgPost(BaseModel):
 server_address = "http://192.168.2.172"
 # server_address = "http://192.168.1.143"
 
-origins = [
-    "http://127.0.0.1:8000",  # This is the default FastAPI server origin
-    "chrome-extension://cdpjgindfjcedmeikjnahnkbpgfkbmpe",  # Replace with your Chrome extension's origin
-    "chrome-extension://anpppboobkdbncaffjiopmjplenamine"
-]
+# origins = [
+#     "http://127.0.0.1:8000",  # This is the default FastAPI server origin
+#     "chrome-extension://cdpjgindfjcedmeikjnahnkbpgfkbmpe",  # Replace with your Chrome extension's origin
+#     "chrome-extension://anpppboobkdbncaffjiopmjplenamine"
+# ]
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI()
 
@@ -189,7 +189,7 @@ app.mount("/imgs", StaticFiles(directory="imgs"), name='images')
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"], #origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
