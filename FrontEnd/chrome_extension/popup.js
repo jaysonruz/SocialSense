@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', async function () {
       }
   });
 
+  // --------------------Submit button function ----------------------
   submitBtn.addEventListener('click', async function () {
     const inputValue = instagramInput.value;
     instagramList.innerHTML = ` 
@@ -209,7 +210,30 @@ document.addEventListener('DOMContentLoaded', async function () {
           });
         }
         // Add event listeners for other buttons as needed (e.g., .btn2)
+
+
+
       });
+
+    // Save instagramList data to chrome.storage
+    chrome.storage.local.set({ 'instagramListData': igPosts }, function () {
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError);
+      } else {
+        console.log('Instagram list data saved to storage.');
+
+        // Retrieve and log the saved data immediately after saving
+        chrome.storage.local.get(['instagramListData'], function (result) {
+          if (chrome.runtime.lastError) {
+            console.error(chrome.runtime.lastError);
+          } else {
+            console.log('Retrieved Instagram list data:', result.instagramListData);
+          }
+        });
+      }
+    });
+
+    
     } else {
       console.error('Error fetching Instagram posts:', response.status, response.statusText);
     }
