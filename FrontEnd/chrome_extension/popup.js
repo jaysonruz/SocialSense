@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', async function () {
   const submitBtn = document.getElementById('submitBtn');
   const instagramList = document.getElementById('instagramList');
   const extensionId = chrome.runtime.id;
+  const userChoices = {};
   const backend_url = "http://192.168.2.172:80";
   
   // Retrieve instagramList data from chrome.storage if it exists
@@ -10,14 +11,29 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (!chrome.runtime.lastError) {
       const savedInstagramListData = result.instagramListData;
       if (savedInstagramListData && Array.isArray(savedInstagramListData)) {
-        // Use the retrieved data to populate the Instagram list
-        populateInstagramList(savedInstagramListData);
+        // Retrieve user choices from chrome.storage.local when the popup is loaded
+        chrome.storage.local.get(['userChoices'], function (result) {
+          if (!chrome.runtime.lastError) {
+            const savedUserChoices = result.userChoices;
+            if (savedUserChoices && typeof savedUserChoices === 'object') {
+              // Update the userChoices object with the saved choices
+              Object.assign(userChoices, savedUserChoices);
+              console.log(userChoices);
+            }
+          } else {
+            console.error(chrome.runtime.lastError);
+          }
+          
+          // Use the retrieved data to populate the Instagram list
+          populateInstagramList(savedInstagramListData);
+        });
       }
     } else {
       console.error(chrome.runtime.lastError);
     }
   });
 
+  
   // Common headers for fetch requests
   const fetchHeaders = {
       'Content-Type': 'application/json',
@@ -155,6 +171,12 @@ function populateInstagramList(igPosts) {
   // Create and append new list items for each post in the response
   igPosts.forEach((post) => {
     console.log(post);
+    // Check if the user has made a choice for this post
+    const postID = post.id;
+    const userChoice = userChoices[postID];
+    console.log(`User's choice for post with ID ${postID}: ${userChoice}`);
+    
+
     const listItem = document.createElement('li');
 
     const errorFreePostHtml = `<li class="no-error">
@@ -240,6 +262,17 @@ function populateInstagramList(igPosts) {
     const fixErrorsBox = listItem.querySelector('.fix-error-box');
     const redBackground = listItem.querySelector('.red');
     const rightIcon = listItem.querySelector('.right-icon');
+    const yesBtn = listItem.querySelector('.btn-green');
+    const noBtn = listItem.querySelector('.btn-red');
+
+    if (userChoice === 'Yes' || userChoice === 'No' || userChoice === 'Dismiss') {
+      // Create HTML for the list item when the user chose "Yes," "No," or "Dismiss"
+      $(fixErrorsBox).slideUp();
+      $(redBackground).css('background', 'white');
+      $(rightIcon).css('display', 'block');
+    } else {
+      // Create a default list item when there's no user choice
+    }
 
     if (fixErrorsBtn) {
       fixErrorsBtn.addEventListener('click', function () {
@@ -247,16 +280,20 @@ function populateInstagramList(igPosts) {
         $(redBackground).css('background', 'white');
       });
     }
-    // Add event listeners for "Yes" and "No" buttons
-    const yesBtn = listItem.querySelector('.btn-green');
-    const noBtn = listItem.querySelector('.btn-red');
-
+    
     if (dismissBtn) {
       dismissBtn.addEventListener('click', async function () {
         await sendHelpfulFeedback(post, helpful = false, dismiss = true);
         $(fixErrorsBox).slideUp();
         $(redBackground).css('background', 'white');
         $(rightIcon).css('display', 'block');
+      
+        // Update user choice for this post
+        userChoices[post.id] = 'Dismiss';
+
+        // Save user choices to chrome.storage.local
+        saveUserChoicesToStorage(userChoices);
+
       });
     }
 
@@ -274,6 +311,14 @@ function populateInstagramList(igPosts) {
         $(fixErrorsBox).slideUp();
         $(redBackground).css('background', 'white');
         $(rightIcon).css('display', 'block');
+
+        // Update user choice for this post
+        userChoices[post.id] = 'Yes';
+
+        // Save user choices to chrome.storage.local
+        saveUserChoicesToStorage(userChoices);
+
+
       });
     }
 
@@ -291,6 +336,13 @@ function populateInstagramList(igPosts) {
         $(fixErrorsBox).slideUp();
         $(redBackground).css('background', 'white');
         $(rightIcon).css('display', 'block');
+
+        // Update user choice for this post
+        userChoices[post.id] = 'No';
+
+        // Save user choices to chrome.storage.local
+        saveUserChoicesToStorage(userChoices);
+
       });
     }
 
@@ -312,6 +364,17 @@ function saveInstagramListToStorage(igPosts) {
       console.error(chrome.runtime.lastError);
     } else {
       console.log('Instagram list data saved to storage.');
+    }
+  });
+}
+
+// Function to save user choices to chrome.storage.local
+function saveUserChoicesToStorage(choices) {
+  chrome.storage.local.set({ 'userChoices': choices }, function () {
+    if (chrome.runtime.lastError) {
+      console.error(chrome.runtime.lastError);
+    } else {
+      console.log('User choices saved to storage.');
     }
   });
 }
