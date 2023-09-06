@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', async function () {
   const userChoices = {};
   const backend_url = "http://192.168.2.172:80";
   
+  // Call the function to listen for changes in chrome.storage.local
+  listenForStorageChanges();
+
   // Retrieve instagramList data from chrome.storage if it exists
   chrome.storage.local.get(['instagramListData'], function (result) {
     if (!chrome.runtime.lastError) {
@@ -45,6 +48,13 @@ document.addEventListener('DOMContentLoaded', async function () {
   // If JWT token exists, add it to the headers
   if (jwtToken) {
       fetchHeaders['Authorization'] = `Bearer ${jwtToken}`;
+      chrome.storage.local.set({ 'jwtToken': jwtToken }, function () {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError);
+        } else {
+          console.log('JWT token saved to storage.');
+        }
+      });
   }
 
   // Add event listener for the "keydown" event on the input field
@@ -56,39 +66,28 @@ document.addEventListener('DOMContentLoaded', async function () {
   });
 
   // --------------------Submit button function ----------------------
-  submitBtn.addEventListener('click', async function () {
-    const inputValue = instagramInput.value;
-    instagramList.innerHTML = ` 
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%; text-align: center;">
-        <p style="margin-bottom: 100px;">This should take a minute, you can get back to your work and we will drop you a notification once this is ready</p>
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden"></span>
-        </div>
-    </div>`;
+// Submit button function
+submitBtn.addEventListener('click', async function () {
+  const inputValue = instagramInput.value;
 
-    const response = await fetch(backend_url + '/instagram_posts', {
-        method: 'POST',
-        headers: fetchHeaders, // Use the common headers
-        body: JSON.stringify({
-            instagram_id: inputValue,
-        }),
-    });
-
-    
-    if (response.ok) {
-      const igPosts = await response.json();
-      
-      //populate the Instagram list
-      populateInstagramList(igPosts)
-
-      // Call the function to save igPosts
-      saveInstagramListToStorage(igPosts);
-
+  // Send a message to the background script to start fetching
+  chrome.runtime.sendMessage({ action: "fetchInstagramPosts", inputValue }, function (response) {
+    if (chrome.runtime.lastError) {
+      console.error(chrome.runtime.lastError);
     } else {
-      console.error('Error fetching Instagram posts:', response.status, response.statusText);
+      console.log('Message sent to background script.');
     }
-
   });
+
+  // Show the spinner
+  instagramList.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100%; text-align: center;">
+      <p style="margin-bottom: 100px;">This should take a minute, you can get back to your work and we will drop you a notification once this is ready</p>
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden"></span>
+      </div>
+    </div>`;
+});
   
   async function sendHelpfulFeedback(post, helpful, dismiss=false) {
     const response = await fetch(backend_url + '/save_ig_posts', {
@@ -375,6 +374,19 @@ function saveUserChoicesToStorage(choices) {
       console.error(chrome.runtime.lastError);
     } else {
       console.log('User choices saved to storage.');
+    }
+  });
+}
+
+function listenForStorageChanges() {
+  chrome.storage.local.onChanged.addListener(function (changes, namespace) {
+    if ('instagramListData' in changes) {
+      // Data in chrome.storage.local has changed, update the UI
+      const igPosts = changes.instagramListData.newValue;
+      if (igPosts && Array.isArray(igPosts)) {
+        // Call a function to populate the Instagram list with the new data
+        populateInstagramList(igPosts);
+      }
     }
   });
 }

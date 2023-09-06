@@ -1,6 +1,9 @@
 import regex as re
 # from gingerit.gingerit import GingerIt
-from services.local_gingerit import GingerIt # import locally
+try:
+    from services.local_gingerit import GingerIt # import locally
+except:
+    from local_gingerit import GingerIt
 
 def remove_emoticons_hashtags_tags(text):
     # Remove emoticons
