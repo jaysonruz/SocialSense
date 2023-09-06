@@ -65,14 +65,8 @@ document.addEventListener('DOMContentLoaded', async function () {
       //populate the Instagram list
       populateInstagramList(igPosts)
 
-      // Save instagramList data to chrome.storage
-      chrome.storage.local.set({ 'instagramListData': igPosts }, function () {
-        if (chrome.runtime.lastError) {
-          console.error(chrome.runtime.lastError);
-        } else {
-          console.log('Instagram list data saved to storage.');
-      }
-      });
+      // Call the function to save igPosts
+      saveInstagramListToStorage(igPosts);
 
     } else {
       console.error('Error fetching Instagram posts:', response.status, response.statusText);
@@ -308,6 +302,17 @@ function populateInstagramList(igPosts) {
       });
     }
     // Add event listeners for other buttons
+  });
+}
+
+function saveInstagramListToStorage(igPosts) {
+  // Save instagramList data to chrome.storage
+  chrome.storage.local.set({ 'instagramListData': igPosts }, function () {
+    if (chrome.runtime.lastError) {
+      console.error(chrome.runtime.lastError);
+    } else {
+      console.log('Instagram list data saved to storage.');
+    }
   });
 }
 
