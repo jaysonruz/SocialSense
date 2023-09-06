@@ -86,6 +86,10 @@ tb_saved_ig_posts = sqlalchemy.Table(
     sqlalchemy.Column("correction_results", sqlalchemy.String(1000), nullable=False),
     sqlalchemy.Column("helpful", sqlalchemy.Boolean, nullable=False),
     sqlalchemy.Column("dismiss", sqlalchemy.Boolean, nullable=False, server_default=sqlalchemy.sql.expression.false()),
+    sqlalchemy.Column("created_by", sqlalchemy.String(20), nullable=False),
+    sqlalchemy.Column("updated_by", sqlalchemy.String(20), nullable=False),
+    sqlalchemy.Column("created_at", sqlalchemy.DateTime, nullable=False,
+                      server_default=sqlalchemy.func.now()),
     sqlalchemy.Column(
         "updated_at",
         sqlalchemy.DateTime,
@@ -284,6 +288,8 @@ async def save_ig_posts(saved_post: SavedIgPost, token: dict = Depends(verify_to
             "correction_results": saved_post.correction_results,
             "helpful": saved_post.helpful,
             "dismiss": saved_post.dismiss,
+            "created_by":user_id,
+            "updated_by":user_id,
         }
 
         query = tb_saved_ig_posts.insert().values(**values)
