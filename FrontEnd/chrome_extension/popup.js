@@ -5,6 +5,19 @@ document.addEventListener('DOMContentLoaded', async function () {
   const extensionId = chrome.runtime.id;
   const backend_url = "http://192.168.2.172:80";
   
+  // Retrieve instagramList data from chrome.storage if it exists
+  chrome.storage.local.get(['instagramListData'], function (result) {
+    if (!chrome.runtime.lastError) {
+      const savedInstagramListData = result.instagramListData;
+      if (savedInstagramListData && Array.isArray(savedInstagramListData)) {
+        // Use the retrieved data to populate the Instagram list
+        populateInstagramList(savedInstagramListData);
+      }
+    } else {
+      console.error(chrome.runtime.lastError);
+    }
+  });
+
   // Common headers for fetch requests
   const fetchHeaders = {
       'Content-Type': 'application/json',
@@ -48,195 +61,23 @@ document.addEventListener('DOMContentLoaded', async function () {
     
     if (response.ok) {
       const igPosts = await response.json();
+      
+      //populate the Instagram list
+      populateInstagramList(igPosts)
 
-      // Calculate the number of results
-      const resultCount = igPosts.length;
-
-      // Update the result count in the <p> element
-      const resultCountElement = document.getElementById('resultCount');
-      resultCountElement.textContent = `Results: ${resultCount}`;
-
-      // Clear the existing list items
-      instagramList.innerHTML = '';
-
-      // Create and append new list items for each post in the response
-      igPosts.forEach((post) => {
-        console.log(post);
-        const listItem = document.createElement('li');
-
-        const errorFreePostHtml = `<li class="no-error">
-        <div class="row">
-          <div class="col-4">
-            <div class="ratio ratio-1x1"> <img id="post_image" src="${post.displayUrl_hosted}" class="img-fluid post-img"> </div>
-          </div>
-          <div class="col-8">
-            <p><strong>Caption:</strong><span class="caption">${post.caption}</span></p>
-            <div class="row">
-              <div class="col-6">
-                <p>Total errors: ${post.total_errors}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="post-container">
-          <div style="flex: 1;"> </div>
-        </div>
-      </li>`;
-      const errorPostHTML = `
-      <li class="red">
-          <div class="row">
-              <div class="col-12">
-                  <div class="row position-relative">
-                      <div class="right-icon" style="display: none;">
-                          <img src="images/right-icon.svg" class="img-fluid">
-                      </div>
-                      <div class="col-4">
-                          <div class="ratio ratio-1x1">
-                              <img id="post_image" src="${post.displayUrl_hosted}" class="img-fluid post-img">
-                          </div>
-                      </div>
-                      <div class="col-8 pe-3">
-                          <p><strong>Caption:</strong><span class="caption">${highlightCorrectionsInCap(post.caption, post.corrections_list)}</span></p>
-                          <div class="row align-items-center">
-                              <div class="col-5">
-                                  <p class="mb-0">Total errors: ${post.total_errors}</p>
-                              </div>
-                              <div class="col-7 d-flex text-end">
-                                  <button class="btn btn-primary btn-sm btn1 light-grren fw-bold">Fix errors</button>
-                                  <button class="btn btn-secondary btn-sm btn2 light-red fw-bold ms-2">Dismiss</button>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-                  <div class="row mt-3">
-                      <div class="col-12">
-                          <div class="fix-error-box position-relative" style="display: none;">
-                              <p class="fw-bold">Total errors fixed: ${post.total_errors}</p>
-                              <p id="p1">${highlightCorrectionsInRes(post.correction_results, post.corrections_list)}</p>
-                              <p class="copy-icon">
-                                  <img id="copyButton" src="images/copy-icon.svg" class="img-fluid">
-                              </p>
-                              <div class="d-flex align-items-center">
-                                  <button type="button" class="btn btn-primary btn-sm me-2 btn-green btn2">Accept feedback</button>
-                                  <button type="button" class="btn btn-primary btn-sm btn-red btn2">Ignore feedback</button>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
-          <div class="post-container">
-              <div style="flex: 1;"> </div>
-          </div>
-      </li>`;
-  
-
-        // Conditionally set the PostHTML based on the value of post.any_corrections
-        let postHTML;
-        if (post.any_corrections === true) {
-          postHTML = errorPostHTML;
+      // Save instagramList data to chrome.storage
+      chrome.storage.local.set({ 'instagramListData': igPosts }, function () {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError);
         } else {
-          postHTML = errorFreePostHtml;
-        }
-
-        listItem.innerHTML = postHTML;
-        instagramList.appendChild(listItem);
-
-        // Add event listener for the "Fix errors" button
-        const fixErrorsBtn = listItem.querySelector('.btn1');
-        const dismissBtn = listItem.querySelector('.btn2');
-        const fixErrorsBox = listItem.querySelector('.fix-error-box');
-        const redBackground = listItem.querySelector('.red');
-        const rightIcon = listItem.querySelector('.right-icon');
-        
-        if (fixErrorsBtn) {
-          fixErrorsBtn.addEventListener('click', function () {
-            $(fixErrorsBox).slideDown();
-            $(redBackground).css('background', 'white');
-          });
-        }
-        // Add event listeners for "Yes" and "No" buttons
-        const yesBtn = listItem.querySelector('.btn-green');
-        const noBtn = listItem.querySelector('.btn-red');
-
-        if (dismissBtn) {
-          dismissBtn.addEventListener('click', async function () {
-            await sendHelpfulFeedback(post, helpful=false,dismiss=true);
-            $(fixErrorsBox).slideUp();
-            $(redBackground).css('background', 'white');
-            $(rightIcon).css('display', 'block');
-          });
-        }
-
-        if (yesBtn) {
-          yesBtn.addEventListener('mouseenter', function () {
-            yesBtn.setAttribute('title', "This will give us data that our QC bot corrected something good");
-          });
-        
-          yesBtn.addEventListener('mouseout', function () {
-            yesBtn.removeAttribute('title');
-          });
-
-          yesBtn.addEventListener('click', async function () {
-            await sendHelpfulFeedback(post, true);
-            $(fixErrorsBox).slideUp();
-            $(redBackground).css('background', 'white');
-            $(rightIcon).css('display', 'block');
-          });
-        }
-    
-        if (noBtn) {
-          noBtn.addEventListener('mouseenter', function () {
-            noBtn.setAttribute('title', " this will give us feedback that our bots recommendation was ignored ");
-          });
-        
-          noBtn.addEventListener('mouseout', function () {
-            noBtn.removeAttribute('title');
-          });
-
-          noBtn.addEventListener('click', async function () {
-            await sendHelpfulFeedback(post, false);
-            $(fixErrorsBox).slideUp();
-            $(redBackground).css('background', 'white');
-            $(rightIcon).css('display', 'block');
-          });
-        }
-
-        // Add event listener for the copy icon button
-        const copyButton = listItem.querySelector('#copyButton');
-        if (copyButton) {
-          copyButton.addEventListener('click', function () {
-            copyCorrectionResults(post.correction_results);
-          });
-        }
-        // Add event listeners for other buttons as needed (e.g., .btn2)
-
-
-
+          console.log('Instagram list data saved to storage.');
+      }
       });
 
-    // Save instagramList data to chrome.storage
-    chrome.storage.local.set({ 'instagramListData': igPosts }, function () {
-      if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError);
-      } else {
-        console.log('Instagram list data saved to storage.');
-
-        // Retrieve and log the saved data immediately after saving
-        chrome.storage.local.get(['instagramListData'], function (result) {
-          if (chrome.runtime.lastError) {
-            console.error(chrome.runtime.lastError);
-          } else {
-            console.log('Retrieved Instagram list data:', result.instagramListData);
-          }
-        });
-      }
-    });
-
-    
     } else {
       console.error('Error fetching Instagram posts:', response.status, response.statusText);
     }
+
   });
   
   async function sendHelpfulFeedback(post, helpful, dismiss=false) {
@@ -306,6 +147,168 @@ function escapeRegex(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function populateInstagramList(igPosts) {
+  // Calculate the number of results
+  const resultCount = igPosts.length;
 
+  // Update the result count in the <p> element
+  const resultCountElement = document.getElementById('resultCount');
+  resultCountElement.textContent = `Results: ${resultCount}`;
+
+  // Clear the existing list items
+  instagramList.innerHTML = '';
+
+  // Create and append new list items for each post in the response
+  igPosts.forEach((post) => {
+    console.log(post);
+    const listItem = document.createElement('li');
+
+    const errorFreePostHtml = `<li class="no-error">
+      <div class="row">
+        <div class="col-4">
+          <div class="ratio ratio-1x1"> <img id="post_image" src="${post.displayUrl_hosted}" class="img-fluid post-img"> </div>
+        </div>
+        <div class="col-8">
+          <p><strong>Caption:</strong><span class="caption">${post.caption}</span></p>
+          <div class="row">
+            <div class="col-6">
+              <p>Total errors: ${post.total_errors}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="post-container">
+        <div style="flex: 1;"> </div>
+      </div>
+    </li>`;
+    const errorPostHTML = `
+    <li class="red">
+        <div class="row">
+            <div class="col-12">
+                <div class="row position-relative">
+                    <div class="right-icon" style="display: none;">
+                        <img src="images/right-icon.svg" class="img-fluid">
+                    </div>
+                    <div class="col-4">
+                        <div class="ratio ratio-1x1">
+                            <img id="post_image" src="${post.displayUrl_hosted}" class="img-fluid post-img">
+                        </div>
+                    </div>
+                    <div class="col-8 pe-3">
+                        <p><strong>Caption:</strong><span class="caption">${highlightCorrectionsInCap(post.caption, post.corrections_list)}</span></p>
+                        <div class="row align-items-center">
+                            <div class="col-5">
+                                <p class="mb-0">Total errors: ${post.total_errors}</p>
+                            </div>
+                            <div class="col-7 d-flex text-end">
+                                <button class="btn btn-primary btn-sm btn1 light-grren fw-bold">Fix errors</button>
+                                <button class="btn btn-secondary btn-sm btn2 light-red fw-bold ms-2">Dismiss</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="fix-error-box position-relative" style="display: none;">
+                            <p class="fw-bold">Total errors fixed: ${post.total_errors}</p>
+                            <p id="p1">${highlightCorrectionsInRes(post.correction_results, post.corrections_list)}</p>
+                            <p class="copy-icon">
+                                <img id="copyButton" src="images/copy-icon.svg" class="img-fluid">
+                            </p>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-primary btn-sm me-2 btn-green btn2">Accept feedback</button>
+                                <button type="button" class="btn btn-primary btn-sm btn-red btn2">Ignore feedback</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="post-container">
+            <div style="flex: 1;"> </div>
+        </div>
+    </li>`;
+
+    // Conditionally set the PostHTML based on the value of post.any_corrections
+    let postHTML;
+    if (post.any_corrections === true) {
+      postHTML = errorPostHTML;
+    } else {
+      postHTML = errorFreePostHtml;
+    }
+
+    listItem.innerHTML = postHTML;
+    instagramList.appendChild(listItem);
+
+    // Add event listener for the "Fix errors" button
+    const fixErrorsBtn = listItem.querySelector('.btn1');
+    const dismissBtn = listItem.querySelector('.btn2');
+    const fixErrorsBox = listItem.querySelector('.fix-error-box');
+    const redBackground = listItem.querySelector('.red');
+    const rightIcon = listItem.querySelector('.right-icon');
+
+    if (fixErrorsBtn) {
+      fixErrorsBtn.addEventListener('click', function () {
+        $(fixErrorsBox).slideDown();
+        $(redBackground).css('background', 'white');
+      });
+    }
+    // Add event listeners for "Yes" and "No" buttons
+    const yesBtn = listItem.querySelector('.btn-green');
+    const noBtn = listItem.querySelector('.btn-red');
+
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', async function () {
+        await sendHelpfulFeedback(post, helpful = false, dismiss = true);
+        $(fixErrorsBox).slideUp();
+        $(redBackground).css('background', 'white');
+        $(rightIcon).css('display', 'block');
+      });
+    }
+
+    if (yesBtn) {
+      yesBtn.addEventListener('mouseenter', function () {
+        yesBtn.setAttribute('title', "This will give us data that our QC bot corrected something good");
+      });
+
+      yesBtn.addEventListener('mouseout', function () {
+        yesBtn.removeAttribute('title');
+      });
+
+      yesBtn.addEventListener('click', async function () {
+        await sendHelpfulFeedback(post, true);
+        $(fixErrorsBox).slideUp();
+        $(redBackground).css('background', 'white');
+        $(rightIcon).css('display', 'block');
+      });
+    }
+
+    if (noBtn) {
+      noBtn.addEventListener('mouseenter', function () {
+        noBtn.setAttribute('title', " this will give us feedback that our bots recommendation was ignored ");
+      });
+
+      noBtn.addEventListener('mouseout', function () {
+        noBtn.removeAttribute('title');
+      });
+
+      noBtn.addEventListener('click', async function () {
+        await sendHelpfulFeedback(post, false);
+        $(fixErrorsBox).slideUp();
+        $(redBackground).css('background', 'white');
+        $(rightIcon).css('display', 'block');
+      });
+    }
+
+    // Add event listener for the copy icon button
+    const copyButton = listItem.querySelector('#copyButton');
+    if (copyButton) {
+      copyButton.addEventListener('click', function () {
+        copyCorrectionResults(post.correction_results);
+      });
+    }
+    // Add event listeners for other buttons
+  });
+}
 
 });
