@@ -2,6 +2,14 @@ import requests
 from pprint import pprint
 import os
 from dotenv import load_dotenv
+
+# Try to import the function relatively, if not, import it absolutely
+try:
+    from services.sapling_to_ginger import sapling_to_gingerit_format
+except ImportError:
+    from sapling_to_ginger import sapling_to_gingerit_format
+    print("locally imported")
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
@@ -26,6 +34,7 @@ def get_sapling_edits(text):
 
 if __name__=="__main__":
     # Example usage
-    input_text = """Hatke Style. Hatke Enteertainment. Hatke Twist. New work for the launch of motog14 by Team 21N for @motorolain Client: @motorolain Marketing, Motorola: Shivam Ranjan, Girish Kumar Production House: @zulu.films Producers: @swarupnandaa, piscessom Director: @ishwarmuchhal Creative Team: @newkans, @ptamatta, @gulati_shagun, @yashika.in, @_swati_panwar__ Account Management Team: @bingeljell, @oyesimkhade, @guneet.kaur07 Founder & CEO: @the.malayali"""
+    input_text = """this is my kimgdom come , thsi is my kindom cum."""
     response = get_sapling_edits(input_text)
     pprint(response)
+    pprint(sapling_to_gingerit_format(response,input_text))

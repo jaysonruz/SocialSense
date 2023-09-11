@@ -5,3 +5,5 @@ __pycache__
 *.png
 *.jpeg
 *.jpg
+
+!FrontEnd/chrome_extension/icons/*.png
