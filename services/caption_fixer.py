@@ -1,19 +1,10 @@
 import regex as re
-# from gingerit.gingerit import GingerIt
-# try:
-#     from services.local_gingerit import GingerIt 
-# except:
-#     from local_gingerit import GingerIt
 
 try:
-    from services.sapling import get_sapling_edits 
+    from services.saplinger import sapling_to_gingerit_format 
 except:
-    from sapling import get_sapling_edits
+    from saplinger import sapling_to_gingerit_format
 
-try:
-    from services.sapling_to_ginger import sapling_to_gingerit_format 
-except:
-    from sapling_to_ginger import sapling_to_gingerit_format
 
 def remove_emoticons_hashtags_tags(text):
     # Remove emoticons
@@ -31,13 +22,6 @@ def remove_emoticons_hashtags_tags(text):
     
     return text.strip()
 
-# def check_correction_type(correction):
-#     excluded_correction_types = ['Accept space','Accept comma addition','None']
-#     for correction in ginger_cap['corrections']:
-#         print("\t ------------------",correction['definition'])
-#         if correction['definition'] in excluded_correction_types:
-#             return False
-#     return True
 
 def fix_my_cap(text):
     """
@@ -52,7 +36,7 @@ def fix_my_cap(text):
         # parser = GingerIt()
         # return parser.parse(remove_emoticons_hashtags_tags(text))
         emoticonsless_text=remove_emoticons_hashtags_tags(text)
-        return sapling_to_gingerit_format(get_sapling_edits(emoticonsless_text),emoticonsless_text)
+        return sapling_to_gingerit_format(emoticonsless_text)
         
     except Exception as error:
     # handle the exception
