@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List
 import databases
 import enum
 import jwt
@@ -13,13 +13,13 @@ from passlib.context import CryptContext
 from starlette.requests import Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+import pathlib
 from uvicorn import Config, Server
 
 from services.apify_instagram import scrape_instagram_data
 from services.caption_fixer import fix_my_cap
 from services.Imagedownloader import download_image
 
-import pathlib
 HOME_DIR = pathlib.Path(__file__).parent.resolve()
 STATIC_IMAGES_DIR = HOME_DIR / "imgs"
 
@@ -99,6 +99,16 @@ tb_saved_ig_posts = sqlalchemy.Table(
     ),
 )
 
+# Define the table for sapling_api_responses with corrections as a JSON column
+tb_sapling_api_responses = sqlalchemy.Table(
+    "sapling_api_responses",
+    metadata,
+    sqlalchemy.Column("post_id", sqlalchemy.String(255), primary_key=True, unique=True),
+    sqlalchemy.Column("text", sqlalchemy.String(1000), nullable=False),
+    sqlalchemy.Column("result", sqlalchemy.String(1000), nullable=False),
+    sqlalchemy.Column("corrections", sqlalchemy.JSON, nullable=True)  # JSON column to store corrections as a list
+)
+
 # ---------------------------------------------------------------------------------------------#
 # ------------------------------------------VALIDATORS------------------------------------------#
 
@@ -144,6 +154,7 @@ class SavedIgPost(BaseModel):
     helpful: bool
     dismiss: bool
 
+
 # ---------------------------------------------------------------------------------------------#
 # ------------------------------------------FASTAPI---------------------------------------------#
 
@@ -184,6 +195,39 @@ def verify_token(token: str = Depends(oauth2_scheme)):
         return payload
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Token validation error")
+
+async def get_existing_api_response(post_id: str):
+    query = tb_sapling_api_responses.select().where(tb_sapling_api_responses.c.post_id == post_id)
+    existing_response = await database.fetch_one(query)
+    return existing_response
+
+
+async def insert_sapling_api_response(db, post_id, text, result, corrections=None):
+    """
+    Insert a new record into the sapling_api_responses table or update it if it already exists.
+
+    :param db: Database session
+    :param post_id: The post ID
+    :param text: The text data
+    :param result: The result data
+    :param corrections: Optional corrections as a list
+    :return: None
+    """
+    values = {
+        "post_id": post_id,
+        "text": text,
+        "result": result,
+        "corrections": corrections
+    }
+
+    # Define the upsert query using INSERT OR REPLACE
+    query = tb_sapling_api_responses.insert().values(**values)
+
+    await db.execute(query)
+    await db.commit()
+
+    print(f"DEBUG: api response of post: {post_id} saved successfully")
+
 
 app.mount("/imgs", StaticFiles(directory="imgs"), name='images')
 
@@ -245,11 +289,32 @@ async def fetch_instagram_posts(
     for post in ig_posts:
         print(f"DEBUG: processing {post['id']}")
         try:
-            gingered_op = fix_my_cap(post['caption'])
+            # Check if the response exists in the database
+            existing_response = await get_existing_api_response(post['id'])
+            if existing_response:
+                print(f"DEBUG: Using existing API response for post ID {post['id']}")
+                gingered_op = existing_response
+            else:
+                # If not found, run gingered_op to fix the caption
+                print(f"DEBUG: API response for post ID {post['id']} is not in db.")
+                gingered_op = fix_my_cap(post['caption'])
+                
             post['any_corrections'] = len(gingered_op["corrections"]) > 0
             post['total_errors'] = len(gingered_op["corrections"])
             post['correction_results'] = gingered_op["result"]
             post['corrections_list'] = gingered_op["corrections"]
+
+            try:
+                # Save the API response in the database
+                await insert_sapling_api_response(
+                    database,
+                    post['id'],
+                    post['caption'],
+                    post['correction_results'],
+                    post['corrections_list']
+                )
+            except:
+                print("DEBUG: API response already in the database")
 
             file_name = f"{post['id']}.jpg"
             img_save_path = str(STATIC_IMAGES_DIR / file_name)
@@ -267,6 +332,7 @@ async def fetch_instagram_posts(
     print(f"User ID: {user_id},{db_user['email']}")
 
     return result
+
 
 @app.post("/save_ig_posts")
 async def save_ig_posts(saved_post: SavedIgPost, token: dict = Depends(verify_token)):
@@ -309,3 +375,7 @@ async def validate_token(token: str = Depends(oauth2_scheme)):
     except jwt.PyJWTError:
         print("DEBUG: TOKEN Rejected")
         raise HTTPException(status_code=401, detail="Invalid credentials")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=80)
