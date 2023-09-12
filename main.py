@@ -173,14 +173,14 @@ app = FastAPI()
 
 SECRET_KEY = config('JWT_SECRET')
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -297,7 +297,7 @@ async def fetch_instagram_posts(
             else:
                 # If not found, run gingered_op to fix the caption
                 print(f"DEBUG: API response for post ID {post['id']} is not in db.")
-                gingered_op = fix_my_cap(post['caption'])
+                gingered_op,sapling_op = fix_my_cap(post['caption'])
                 
             post['any_corrections'] = len(gingered_op["corrections"]) > 0
             post['total_errors'] = len(gingered_op["corrections"])

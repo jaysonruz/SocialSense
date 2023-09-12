@@ -133,14 +133,24 @@ submitBtn.addEventListener('click', async function () {
     }, 3000); // Hide after 3 seconds
 }
 
-  function highlightCorrectionsInCap(text, corrections_list) {
-    corrections_list.forEach((correction) => {
-      const originalText = correction.text;    // highlight words to be corrected 
-      const regex = new RegExp(`\\b${escapeRegex(originalText)}\\b`, 'gi');
-      text = text.replace(regex, `<span class="highlight"> ${originalText} </span>`);
-    });
-    return text;
-  }
+function highlightCorrectionsInCap(text, corrections_list) {
+  corrections_list.forEach((correction) => {
+    if (correction.definition === "Punctuation") {
+      // Skip highlighting for items with definition "Punctuation"
+      return;
+    }
+
+    const originalText = correction.text;    // highlight words to be corrected 
+    const regex = new RegExp(`\\b${escapeRegex(originalText)}\\b`, 'gi');
+    text = text.replace(regex, `<span class="highlight"> ${originalText} </span>`);
+  });
+
+  // Log the corrections_list array to the console
+  console.log(corrections_list);
+
+  return text;
+}
+
 
   function highlightCorrectionsInRes(text, corrections_list) {
     corrections_list.forEach((correction) => {

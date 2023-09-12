@@ -52,7 +52,7 @@ def fix_my_cap(text):
     
 
 if __name__ == "__main__":
-    text= """Aaah! Did you know, visiting Maldives is actually one of the easiest countries for us Indians? 🤫🤫 You don’t need a visa, you don’t need to pay for any e-visa. Just book your stay at a local public island instead of a resort island, and you can visit over a long weekend in under ₹40k! \nHere’s how: \n\nOff season flight tickets: ₹20k return \nStay~ 3500-6000/night \nActivities: Opt for free activities like snorkelling or paddle boarding \n\nI’ll talk more about how you can plan a trip and save money in detail, in reels that I post in the coming few days. Stay tuned! ❤️\n\nThis video is from a local island called 📍Fulidhoo in the Vaavu Atoll \n\nI’m wearing: \nOutfit from @styledivacouture \nManaged by @vblitzcommunications \nJewellery: @merakibymehek \n\n#maldives #visitmaldives #maldivesislands #maldivestrip #maldiveslovers #indiantravelblogger #travelblogger #travelphotography #travel #indiantraveller #indiantravelgram"""
+    text= """Never apologize for being yourself. We’re here for it ✨ This is #NikeTech 🍿"""
     
     result = fix_my_cap(text[:])
     print(result)
