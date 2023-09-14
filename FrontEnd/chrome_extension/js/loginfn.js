@@ -123,9 +123,13 @@ document.addEventListener('DOMContentLoaded', async function () {
                 alert('Registration successful. You can now login.');
                 registrationForm.style.display = 'none';
                 loginForm.style.display = 'block';
+            }else if (response.status === 400) {
+                // User already exists
+                console.log('Registration failed: User with this email already exists');
+                alert('Registration failed: User with this email already exists');
             } else {
                 // Failed registration
-                console.error('Registration failed');
+                console.log('Registration failed');
             }
         })
         .catch(error => {

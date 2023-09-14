@@ -251,13 +251,27 @@ async def shutdown():
 
 # --------------------------------------------ROUTES---------------------------------------------#
 
+from fastapi import HTTPException
+
 @app.post("/register", status_code=201, response_model=UserRegOut)
 async def create_user(user: UserRegIn):
+    # Check if a user with the same email already exists
+    existing_user = await database.fetch_one(tb_users.select().where(tb_users.c.email == user.email))
+    
+    if existing_user:
+        raise HTTPException(status_code=400, detail="User with this email already exists")
+    
+    # Hash the password
     user.password = pwd_context.hash(user.password)
+    
+    # Insert the new user
     q = tb_users.insert().values(**user.dict())
     id_ = await database.execute(q)
+    
+    # Fetch and return the newly created user
     user = await database.fetch_one(tb_users.select().where(tb_users.c.id == id_))
     return user
+
 
 @app.post("/login", response_model=dict)
 async def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
