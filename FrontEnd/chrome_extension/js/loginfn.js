@@ -33,8 +33,9 @@ document.addEventListener('DOMContentLoaded', async function () {
         window.location.href = 'index.html';
       } else {
         // Token is invalid or expired, remove it from local storage
-        console.error('Token is invalid or expired.');
+        alert('Token is invalid or expired.');
         localStorage.removeItem('jwtToken');
+        window.location.href = 'login.html';
       }
     }
     //#-----------------------------------
