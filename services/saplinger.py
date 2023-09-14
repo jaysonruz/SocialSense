@@ -15,6 +15,11 @@ def get_sapling_edits(text):
     edits = client.edits(text, session_id='test_session')
     return edits
 
+def get_sapling_spell_checked(text):
+    client = SaplingClient(api_key=os.environ.get("SAPLING_KEY"))
+    edits = client.spellcheck(text, session_id='test_session')
+    return edits
+
 def apply_edits(edits,text):
     text = str(text)
     edits = sorted(edits, key=lambda e: (e['sentence_start'] + e['start']), reverse=True)
@@ -44,14 +49,14 @@ def remove_emoticons_hashtags_tags(text):
     return text.strip()
 
 def sapling_to_gingerit_format(original_text):
-    sapling_response = get_sapling_edits(original_text)
+    sapling_response = get_sapling_spell_checked(original_text)
     corrections = []
 
-    for correction in sapling_response['edits']:
+    for correction in sapling_response:
         start = int(correction['start'])+int(correction["sentence_start"]) 
         end = int(correction['end'])+int(correction["sentence_start"])
         replacement = correction['replacement']
-        general_error_type = correction['general_error_type']
+        general_error_type = "spell-check" #correction['general_error_type']
 
         correction_obj = {
             "start": start,
@@ -65,15 +70,18 @@ def sapling_to_gingerit_format(original_text):
     # Create the desired output format
     output = {
         "text": original_text,
-        "result": apply_edits(sapling_response['edits'],original_text),
+        "result": apply_edits(sapling_response,original_text),
         "corrections": corrections
     }
 
     return output,sapling_response
 
+
+    
+
 if __name__=="__main__":
     # Example usage
-    input_text = """The numbers speak for themselves. 🎾 3x Calendar Grand Slams 🎾 37x Major Titles 🎾 122x Consecutive Singles Matches Won (and counting) Congratulations @diededegroot on another incredible run in New York. You are a true trailblazer and dominant force like no other. 🏆"""
-    cleaned_input_text = remove_emoticons_hashtags_tags(input_text)
-    print(cleaned_input_text)
-    pprint(sapling_to_gingerit_format(cleaned_input_text))
+    input_text = """The numbers  speak for themselves. 🎾 3x Caalendar #Gieeegeeand Slams 🎾 37x Major Titles 🎾 122x Consecutive Singles Matches Won (and counting) Congratulations @diededegroot on another incredible run in New York. You are a true trailblazer and dominant force like no other. 🏆"""
+    pprint(sapling_to_gingerit_format(input_text))
+    pprint(get_sapling_spell_checked(input_text))
+

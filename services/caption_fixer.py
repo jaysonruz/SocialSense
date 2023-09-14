@@ -35,8 +35,8 @@ def fix_my_cap(text):
     try:
         # parser = GingerIt()
         # return parser.parse(remove_emoticons_hashtags_tags(text))
-        emoticonsless_text=remove_emoticons_hashtags_tags(text)
-        return sapling_to_gingerit_format(emoticonsless_text)
+        # emoticonsless_text=remove_emoticons_hashtags_tags(text)
+        return sapling_to_gingerit_format(text)
         
     except Exception as error:
     # handle the exception
@@ -52,7 +52,7 @@ def fix_my_cap(text):
     
 
 if __name__ == "__main__":
-    text= """Never apologize for being yourself. We’re here for it ✨ This is #NikeTech 🍿"""
+    text= """#GoBeyondSpeed. To launch the moto g54 5G, a phone with some truly wild specs in its class, saying howdy to the wild west, was but natural. Our latest for @motorolain Client: @motorolain Marketing, Motorola: Shivam Ranjan , Girish Kumar Director: Yogesh Agarwal Production House: @zulu.films Executive Producers: @swarupnandaa , somdadda Creative Team: @newkans , @ptamatta , @adifyi , @gulati_shagun , @yashika.in , @_swati_panwar__ Account Management Team: @bingeljell , @guneet.kaur07 , @trp_98 Founder & CEO: @the.malayali { if win post this }"""
     
     result = fix_my_cap(text[:])
     print(result)
