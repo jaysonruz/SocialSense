@@ -9,31 +9,66 @@
 
 <body style="width: 600px;margin: 0 auto;">
     <div class="container">
-        
-    <!-- Login Form -->
-    <div id="loginForm">
-        <h2>Login</h2>
-        <form id="loginForm">
-            <input type="email" id="loginEmail" placeholder="Email" required>
-            <input type="password" id="loginPassword" placeholder="Password" required>
-            <button type="submit">Login</button>
-        </form>
-        <p>Don't have an account? <a href="#" id="showRegistrationForm">Register</a></p>
-    </div>
+        <div class="col-12 mb-4">
+            <h2 class="purple-color">SocialSense</h2>
+        </div>
+        <div class="col-12">
+        <!-- Login Form -->
+            <div id="loginForm">
+                <h3 class="fs-5">Log in</h3>
+                    <form id="loginForm">
 
-    <!-- Registration Form -->
-    <div id="registrationForm" style="display: none;">
-        <h2>Register</h2>
-        <form id="registerForm">
-            <input type="email" id="registerEmail" placeholder="Email" required>
-            <input type="text" id="registerFirstName" placeholder="First Name" required>
-            <input type="text" id="registerLastName" placeholder="Last Name" required>
-            <input type="password" id="registerPassword" placeholder="Password" required>
-            <button type="submit">Register</button>
-        </form>
-        <p>Already have an account? <a href="#" id="showLoginForm">Login</a></p>
-    </div>
+                        <div class="mb-3">
+                            <label for="loginEmail" class="form-label text-dark" >Email address</label>
+                            <input type="email" class="form-control box-border" id="loginEmail" aria-describedby="emailHelp" placeholder="Email" required >
+                        </div>
 
+                        <div class="mb-3">
+                            <label for="loginPassword" class="form-label">Password</label>
+                            <input type="password" class="form-control box-border" id="loginPassword" placeholder="Password" required>
+                            <div id="passwordHelpBlock" class="form-text"><a href="#" class="text-dark text-decoration-none">Forgot Password?</a></div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary black-btn">Login</button>
+                            <div class="form-text text-center text-dark">
+                                Don't have a SocialSense account? 
+                                <a href="#" id="showRegistrationForm" class="text-dark fw-bold">Register now </a>
+                        </div>
+
+                        
+                        <div class="col-12 text-center">
+                            <img src="images/21logo.svg" class="img-fluid">
+                        </div>
+
+                    </form>
+            </div>
+        </div>
+    
+        <div class="col-12">
+            <!-- Registration Form -->
+            <div id="registrationForm" style="display: none;">
+                <h3 class="fs-5">Register</h3>
+                <form id="registerForm">
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <label for="firstname" class="form-label text-dark">First Name</label>
+                            <input type="email" class="form-control box-border" id="registerEmail" placeholder="Email" aria-describedby="first">
+                        </div>
+                    </div>
+
+                    <input type="text" id="registerFirstName" placeholder="First Name" required>
+                    
+                    <input type="text" id="registerLastName" placeholder="Last Name" required>
+                    
+                    <input type="password" id="registerPassword" placeholder="Password" required>
+                    
+                    <button type="submit">Register</button>
+
+                </form>
+
+                <p>Already have an account? <a href="#" id="showLoginForm">Login</a></p>
+            </div>
+        </div>
     </div>
 </body>
 </html>
