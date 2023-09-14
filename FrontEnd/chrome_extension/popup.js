@@ -139,6 +139,10 @@ function highlightCorrectionsInCap(text, corrections_list) {
       // Skip highlighting for items with definition "Punctuation"
       return;
     }
+    if (correction.correct.trim().length <= 1) {
+      // Skip the action for items with length <= 1 after trimming whitespace
+      return;
+    }
 
     const originalText = correction.text;    // highlight words to be corrected 
     const regex = new RegExp(`\\b${escapeRegex(originalText)}\\b`, 'gi');
@@ -152,8 +156,13 @@ function highlightCorrectionsInCap(text, corrections_list) {
 }
 
 
-  function highlightCorrectionsInRes(text, corrections_list) {
+function highlightCorrectionsInRes(text, corrections_list) {
     corrections_list.forEach((correction) => {
+        if (correction.correct.trim().length <= 1) {
+          // Skip the action for items with length <= 1 after trimming whitespace
+          return;
+        }
+
         const originalText = correction.correct;
         const regex = new RegExp(`\\b${escapeRegex(originalText)}\\b`, 'gi');
         text = text.replace(regex, `<span class="highlight">$&</span>`);
