@@ -238,3 +238,9 @@ input.form-border {
 	button.btn.black-btn:hover {
     background-color: #303030;
 }
+#resultCount {
+    font-size: 0.9rem; /* Adjust the font size as needed */
+    font-weight: bold;
+    color: rgba(156, 151, 151, 0.569); /* You can change the color to your preference */
+    margin-top: 10px; /* Adjust the margin-top as needed */
+}

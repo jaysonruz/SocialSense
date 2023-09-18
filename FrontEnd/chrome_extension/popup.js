@@ -178,10 +178,11 @@ function escapeRegex(string) {
 function populateInstagramList(igPosts) {
   // Calculate the number of results
   const resultCount = igPosts.length;
-
+  const ownerUsername = igPosts[0].ownerUsername;
+  console.log(igPosts)
   // Update the result count in the <p> element
   const resultCountElement = document.getElementById('resultCount');
-  resultCountElement.textContent = `Results: ${resultCount}`;
+  resultCountElement.textContent = `Instagram ID: ${ownerUsername} | Result Count: ${resultCount}`;
 
   // Clear the existing list items
   instagramList.innerHTML = '';
